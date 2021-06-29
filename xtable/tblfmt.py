@@ -82,7 +82,7 @@ class xtable:
         self.__num_of_cols = len(self.__header)
 
     @staticmethod
-    def init_from_csv(self, csvfile, xheader):
+    def init_from_csv(csvfile, xheader=None, delimiter=',', quotechar='"'):
         header=list()
         data=list()
         if xheader :
@@ -91,7 +91,7 @@ class xtable:
             else :
                 header = [ h for h in xheader.split(",") if h]
         with open(csvfile,newline='') as csvfile :
-            reader = csvreader(csvfile)
+            reader = csv.reader(csvfile, delimiter=delimiter, quotechar=quotechar)
             data += [[c for c in r] for r in [row for row in reader]]
         if not header and len(data)>0:
             header = data[0]
@@ -99,14 +99,14 @@ class xtable:
         return xtable(data,header)
 
     @staticmethod
-    def init_from_json(self, xjson, xheader):
+    def init_from_json(xjson, xheader):
         if os.path.isfile(xjson) :
             xjson = open(xjons,"r").read()
         data,hdr = prepare_table(xjson,xheader)
         return xtable(data,hdr)
 
     @staticmethod
-    def init_from_list(self, xlist, xheader):
+    def init_from_list(xlist, xheader):
         data,hdr = prepare_table(xlist,xheader)
         return xtable(data,hdr)
 
@@ -294,7 +294,7 @@ def xtable_main():
     parser.add_argument( "-c", "--column", action="append", dest="column", help="column names. used when there" "re spaces within.",)
     parser.add_argument( "-C", "--dump-column", dest="dumpcols", help="only print columns indentified by index numbers.",)
     parser.add_argument( "-s", "--sortby", dest="sortby", help="column id starts with 0.")
-    parser.add_argument( "-b", "--sep-char", dest="sepchar", default="\s+", help="char to seperate columns",)
+    parser.add_argument( "-b", "--sep-char", dest="sepchar", default="\s+", help="char to seperate columns. note, default is SPACE, not ','",)
     parser.add_argument( "-w", "--maxcolwidth", dest="maxcolwidth", type=int, default=-1, help="max col width when print in console, min==20",)
     parser.add_argument( "-t", "--table", dest="table", action="store_true", default=False, help="input preformatted by spaces. header should not include spaces.",)
     parser.add_argument( "-v", "--pivot", dest="pivot", action="store_true", default=False, help="pivot wide tables.",)

@@ -7,6 +7,8 @@ import os
 import re
 import csv
 import copy
+import json
+import traceback
 from wcwidth import wcswidth
 from collections import defaultdict
 from itertools import zip_longest
@@ -99,9 +101,9 @@ class xtable:
         return xtable(data,header)
 
     @staticmethod
-    def init_from_json(xjson, xheader):
+    def init_from_json(xjson, xheader=None):
         if os.path.isfile(xjson) :
-            xjson = open(xjons,"r").read()
+            xjson = open(xjson,"r").read()
         data,hdr = prepare_table(xjson,xheader)
         return xtable(data,hdr)
 

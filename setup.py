@@ -25,7 +25,7 @@ setup(
     keywords=[ "xtable","table","simpletable","quicktable" ],
     entry_points={ "console_scripts": 
         [ 
-            "table=xtable:xtable_main", 
+            "xtable=xtable:xtable_main", 
         ] 
     },
 )

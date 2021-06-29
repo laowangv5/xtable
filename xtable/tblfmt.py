@@ -53,8 +53,6 @@ def prepare_table(xjson,xheader=None) :
             return (None,None)
     except:
         traceback.print_exc()
-        if args.debug:
-            print(INPUT)
         return (None,None)
     if header :
         return (data,header)
@@ -67,8 +65,8 @@ class xtable:
         self.__noheader = noheader
         self.__maxrows = maxrows
         self.__tree = tree 
-        self.__data = data 
-        self.__header = header 
+        self.__data = data or list()
+        self.__header = header or list()
         if cols and re.search(",", cols):
             ncols = len(header)
             xmap = [int(i) for i in re.split(r",", cols) if int(i) < ncols]
@@ -92,8 +90,10 @@ class xtable:
                 header = xheader
             else :
                 header = [ h for h in xheader.split(",") if h]
-        with open(csvfile,newline='') as csvfile :
-            reader = csv.reader(csvfile, delimiter=delimiter, quotechar=quotechar)
+        import os
+        csvfile = os.path.expanduser(csvfile)
+        with open(csvfile,newline='') as csv :
+            reader = csv.reader(csv, delimiter=delimiter, quotechar=quotechar)
             data += [[c for c in r] for r in [row for row in reader]]
         if not header and len(data)>0:
             header = data[0]

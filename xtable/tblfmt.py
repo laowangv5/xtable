@@ -59,8 +59,6 @@ def prepare_table(xjson,xheader=None) :
     else :
         return (data[1:],data[0])
 
-
-
 class xtable:
     def __init__(self, data=None, header=None, cols=None, maxcolwidth=-1, noheader=False,tree=False,maxrows=2**30):
         self.__maxcolwidth = int(maxcolwidth)
@@ -84,8 +82,21 @@ class xtable:
         self.__num_of_cols = len(self.__header)
 
     @staticmethod
-    def init_from_csv(self, csvfile, header=True):
-        pass
+    def init_from_csv(self, csvfile, xheader):
+        header=list()
+        data=list()
+        if xheader :
+            if type(xheader) is list :
+                header = xheader
+            else :
+                header = [ h for h in xheader.split(",") if h]
+        with open(csvfile,newline='') as csvfile :
+            reader = csvreader(csvfile)
+            data += [[c for c in r] for r in [row for row in reader]]
+        if not header and len(data)>0:
+            header = data[0]
+            data = data[1:]
+        return xtable(data,header)
 
     @staticmethod
     def init_from_json(self, xjson, xheader):
@@ -93,13 +104,11 @@ class xtable:
             xjson = open(xjons,"r").read()
         data,hdr = prepare_table(xjson,xheader)
         return xtable(data,hdr)
-        pass
 
     @staticmethod
     def init_from_list(self, xlist, xheader):
         data,hdr = prepare_table(xlist,xheader)
         return xtable(data,hdr)
-        pass
 
     def __len__(self):
         return len(self.__data)
@@ -279,88 +288,20 @@ def tokenize(s):
 
 def xtable_main():
     parser = argparse.ArgumentParser()
-    parser.add_argument(
-        "-n",
-        "--lineno",
-        dest="lineno",
-        default=False,
-        action="store_true",
-        help="show line no.",
-    )
+    parser.add_argument( "-n", "--lineno", dest="lineno", default=False, action="store_true", help="show line no.",)
     parser.add_argument("-H", "--header", dest="header", help="header columns")
     parser.add_argument("-f", "--infile", dest="infile", help="input file")
-    parser.add_argument(
-        "-c",
-        "--column",
-        action="append",
-        dest="column",
-        help="column names. used when there" "re spaces within.",
-    )
-    parser.add_argument(
-        "-C",
-        "--dump-column",
-        dest="dumpcols",
-        help="only print columns indentified by index numbers.",
-    )
-    parser.add_argument(
-        "-s", "--sortby", dest="sortby", help="column id starts with 0."
-    )
-    parser.add_argument(
-        "-b",
-        "--sep-char",
-        dest="sepchar",
-        default="\s+",
-        help="char to seperate columns",
-    )
-    parser.add_argument(
-        "-w",
-        "--maxcolwidth",
-        dest="maxcolwidth",
-        type=int,
-        default=-1,
-        help="max col width when print in console, min==20",
-    )
-    parser.add_argument(
-        "-t",
-        "--table",
-        dest="table",
-        action="store_true",
-        default=False,
-        help="input preformatted by spaces. header should not include spaces.",
-    )
-    parser.add_argument(
-        "-v",
-        "--pivot",
-        dest="pivot",
-        action="store_true",
-        default=False,
-        help="pivot wide tables.",
-    )
-    parser.add_argument(
-        "-T",
-        "--tree",
-        dest="tree",
-        action="store_true",
-        default=False,
-        help="indicate the table is of tree struture",
-    )
+    parser.add_argument( "-c", "--column", action="append", dest="column", help="column names. used when there" "re spaces within.",)
+    parser.add_argument( "-C", "--dump-column", dest="dumpcols", help="only print columns indentified by index numbers.",)
+    parser.add_argument( "-s", "--sortby", dest="sortby", help="column id starts with 0.")
+    parser.add_argument( "-b", "--sep-char", dest="sepchar", default="\s+", help="char to seperate columns",)
+    parser.add_argument( "-w", "--maxcolwidth", dest="maxcolwidth", type=int, default=-1, help="max col width when print in console, min==20",)
+    parser.add_argument( "-t", "--table", dest="table", action="store_true", default=False, help="input preformatted by spaces. header should not include spaces.",)
+    parser.add_argument( "-v", "--pivot", dest="pivot", action="store_true", default=False, help="pivot wide tables.",)
+    parser.add_argument( "-T", "--tree", dest="tree", action="store_true", default=False, help="indicate the table is of tree struture",)
     parser.add_argument("-F", "--format", dest="format", help="json,yaml,csv,html")
-    parser.add_argument(
-        "-d",
-        "--dataonly",
-        dest="dataonly",
-        action="store_true",
-        default=False,
-        help="indicate there's no header",
-    )
-    parser.add_argument(
-        "-X",
-        "--debug",
-        dest="debug",
-        action="store_true",
-        default=False,
-        help="debug mode",
-    )
+    parser.add_argument( "-d", "--dataonly", dest="dataonly", action="store_true", default=False, help="indicate there's no header",)
+    parser.add_argument( "-X", "--debug", dest="debug", action="store_true", default=False, help="debug mode",)
     args = parser.parse_args()
 
     colsdict = defaultdict()

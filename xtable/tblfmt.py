@@ -108,7 +108,7 @@ class xtable:
         return xtable(data,hdr)
 
     @staticmethod
-    def init_from_list(xlist, xheader):
+    def init_from_list(xlist, xheader=None):
         data,hdr = prepare_table(xlist,xheader)
         return xtable(data,hdr)
 
@@ -344,7 +344,10 @@ def xtable_main():
     if js :
         if type(js) is list :
             xt = xtable.init_from_json(js,args.header)
-            print(xt)
+            if args.pivot :
+                print(xt.pivot())
+            else :
+                print(xt)
         sys.exit(0)
 
     for ln in INPUT:

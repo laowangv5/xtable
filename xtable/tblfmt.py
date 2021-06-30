@@ -102,7 +102,7 @@ class xtable:
 
     @staticmethod
     def init_from_json(xjson, xheader=None):
-        if os.path.isfile(xjson) :
+        if type(xjson) is str and os.path.isfile(xjson) :
             xjson = open(xjson,"r").read()
         data,hdr = prepare_table(xjson,xheader)
         return xtable(data,hdr)
@@ -293,7 +293,7 @@ def xtable_main():
     parser.add_argument( "-n", "--lineno", dest="lineno", default=False, action="store_true", help="show line no.",)
     parser.add_argument("-H", "--header", dest="header", help="header columns")
     parser.add_argument("-f", "--infile", dest="infile", help="input file")
-    parser.add_argument( "-c", "--column", action="append", dest="column", help="column names. used when there" "re spaces within.",)
+    parser.add_argument( "-c", "--column", action="append", dest="column", help="column names. used when there're spaces within.",)
     parser.add_argument( "-C", "--dump-column", dest="dumpcols", help="only print columns indentified by index numbers.",)
     parser.add_argument( "-s", "--sortby", dest="sortby", help="column id starts with 0.")
     parser.add_argument( "-b", "--sep-char", dest="sepchar", default="\s+", help="char to seperate columns. note, default is SPACE, not ','",)
@@ -334,6 +334,19 @@ def xtable_main():
     if args.infile:
         with open(args.infile, "r") as f:
             INPUT = f.readlines()
+
+    instr = INPUT.read()
+    js = None
+    try :
+        js = json.loads(instr)
+    except :
+        INPUT = instr.splitlines()
+    if js :
+        if type(js) is list :
+            xt = xtable.init_from_json(js,args.header)
+            print(xt)
+        sys.exit(0)
+
     for ln in INPUT:
         if not ln or not re.search(r"\S+", ln):
             continue
@@ -370,7 +383,6 @@ def xtable_main():
     if args.dataonly:
         data = [oheader] + data
     if args.sortby:
-
         def fsort(x):
             v = list()
             for i in re.split(r",", args.sortby):
@@ -381,8 +393,8 @@ def xtable_main():
                     v.append(0)
                 v.append(v0)
             return v
-
         data = sorted(data, key=fsort)
+
     if args.pivot:
         print(xtable(header=oheader, data=data, cols=args.dumpcols).pivot())
     else:

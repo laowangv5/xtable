@@ -92,8 +92,8 @@ class xtable:
                 header = [ h for h in xheader.split(",") if h]
         import os
         csvfile = os.path.expanduser(csvfile)
-        with open(csvfile,newline='') as csv :
-            reader = csv.reader(csv, delimiter=delimiter, quotechar=quotechar)
+        with open(csvfile,newline='') as cf :
+            reader = csv.reader(cf, delimiter=delimiter, quotechar=quotechar)
             data += [[c for c in r] for r in [row for row in reader]]
         if not header and len(data)>0:
             header = data[0]

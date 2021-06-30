@@ -28,7 +28,7 @@ xt = xtable(data=data,header=hdr)
 11    3  4  5
 11    3     5
 </pre>
-
+-----
 
 <pre><font color="#33C7DE"># test/t2.csv</font>
 <font color="#C061CB">&apos;&apos;&apos;</font>
@@ -48,7 +48,7 @@ asd sdfsadf 1
 c   cc      233
 </pre>
 
-
+-----
 <pre>
 data = [
         {<font color="#C061CB">&quot;h1&quot;</font>:<font color="#C061CB">&quot;v1&quot;</font>,<font color="#C061CB">&quot;h2&quot;</font>:<font color="#C061CB">&quot;v2&quot;</font>,<font color="#C061CB">&quot;h3&quot;</font>:<font color="#C061CB">&quot;v3&quot;</font>},
@@ -68,6 +68,7 @@ v11111 v22222 v34444
 
 </pre>
 
+-----
 
 // all of them support "xheader".
 
@@ -97,7 +98,10 @@ v22    v33
 v22222 v34444
 </pre>
 
+-----
+
 // output json/yaml/csv/html
+
 <pre>
 
 data = [
@@ -154,6 +158,7 @@ xt = xtable.init_from_list(data, xheader=[<font color="#C061CB">&quot;h1&quot;</
 &lt;/tr&gt;
 </pre>
 
+-----
 
 ## use the command line
 
@@ -178,6 +183,7 @@ h1    h2        h3
 &quot;asd&quot; &quot;sdfsadf&quot; 1
 &quot;c&quot;   &quot;cc&quot;      233</pre>
 
+-----
 
 <pre>[yonghang@mtp xtable]$ cat test/t3.json  | qic
 [
@@ -228,7 +234,7 @@ userId firstName lastName phoneNumber emailAddress
 5      jone      mac      111111111   jone.mac@learningcontainer.com
 </pre>
 
-
+-----
 ### pivot 
 <pre>[yonghang@mtp xtable]$ cat test/t3.json  | xtable -v
 userId       : 1
@@ -273,7 +279,7 @@ if we look at the source code, we know class xtable support .pivot() as well,
 </pre>
 
 
-
+-----
 ### when header has space...
 some command output is already a table, only not that decent, eg. as below. xtable will help a little bit.  `-c` told xtable that `container id` is together while `-t` told xtable the input stream is already in "table" format.
 

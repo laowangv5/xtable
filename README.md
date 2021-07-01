@@ -1,4 +1,4 @@
-## [back](https://walkerever.github.io/)
+## [doc on github.io](https://walkerever.github.io/)
 
 
 # xtable

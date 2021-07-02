@@ -316,3 +316,41 @@ PORTS        :
 NAMES        : sad_lamar
 </pre>
 
+### xtable take care of lines
+
+<pre>[yonghang@W5202860 test]$ cat sql.json  | qic
+[
+  {
+    <font color="#008700"><b>&quot;name&quot;</b></font>: <font color="#AF0000">&quot;sql example 1&quot;</font>,
+    <font color="#008700"><b>&quot;query&quot;</b></font>: <font color="#AF0000">&quot;SELECT QUARTER, REGION, SUM(SALES)\n FROM SALESTABLE\n GROUP BY CUBE (QUARTER, REGION)&quot;</font>
+  },
+  {
+    <font color="#008700"><b>&quot;name&quot;</b></font>: <font color="#AF0000">&quot;sql example 2&quot;</font>,
+    <font color="#008700"><b>&quot;query&quot;</b></font>: <font color="#AF0000">&quot;select name, cast(text as varchar(8000)) \nfrom SYSIBM.SYSVIEWS \n where name=&apos;your table name&apos; &quot;</font>
+  },
+  {
+    <font color="#008700"><b>&quot;name&quot;</b></font>: <font color="#AF0000">&quot;sql example 3&quot;</font>,
+    <font color="#008700"><b>&quot;query&quot;</b></font>: <font color="#AF0000">&quot;select Id, max(V1),max(V2),max(V3) from \n (\n select ID,Value V1,&apos;&apos; V2,&apos;&apos; V3 from A where Code=1 \n union all \n select ID,&apos;&apos; V1, Value V2,&apos;&apos; V3 from A where Code=2 \n union all \n select ID,&apos;&apos; V1, &apos;&apos; V2,Value V3 from A where Code=3 \n) AG\n group by ID&quot;</font>
+  }
+]
+
+[yonghang@W5202860 test]$ 
+[yonghang@W5202860 test]$ cat sql.json  | xtable
+name          query
+-------------------------------------------------------------------
+sql example 1 SELECT QUARTER, REGION, SUM(SALES)
+               FROM SALESTABLE
+               GROUP BY CUBE (QUARTER, REGION)
+sql example 2 select name, cast(text as varchar(8000))
+              from SYSIBM.SYSVIEWS
+               where name=&apos;your table name&apos;
+sql example 3 select Id, max(V1),max(V2),max(V3) from
+               (
+               select ID,Value V1,&apos;&apos; V2,&apos;&apos; V3 from A where Code=1
+               union all
+               select ID,&apos;&apos; V1, Value V2,&apos;&apos; V3 from A where Code=2
+               union all
+               select ID,&apos;&apos; V1, &apos;&apos; V2,Value V3 from A where Code=3
+              ) AG
+               group by ID
+</pre>

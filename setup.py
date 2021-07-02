@@ -10,11 +10,11 @@ README = (HERE / "README.md").read_text()
 # This call to setup() does all the work
 setup(
     name="xtable",
-    version="1.0.6",
+    version="1.0.7",
     description="print table in console",
     long_description=README,
     long_description_content_type="text/markdown",
-    url="https://github.com/laowangv5/xtable",
+    url="https://github.com/walkerever/xtable",
     author="Yonghang Wang",
     author_email="wyhang@gmail.com",
     license="Apache 2",

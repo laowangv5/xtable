@@ -1,0 +1,14 @@
+[
+  {
+    "name": "sql example 1",
+    "query": "SELECT QUARTER, REGION, SUM(SALES)\n FROM SALESTABLE\n GROUP BY CUBE (QUARTER, REGION)"
+  },
+  {
+    "name": "sql example 2",
+    "query": "select name, cast(text as varchar(8000)) \nfrom SYSIBM.SYSVIEWS \n where name='your table name' "
+  },
+  {
+    "name": "sql example 3",
+    "query": "select Id, max(V1),max(V2),max(V3) from \n (\n select ID,Value V1,'' V2,'' V3 from A where Code=1 \n union all \n select ID,'' V1, Value V2,'' V3 from A where Code=2 \n union all \n select ID,'' V1, '' V2,Value V3 from A where Code=3 \n) AG\n group by ID"
+  }
+]

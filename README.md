@@ -1,9 +1,14 @@
 ## [doc on github.io](https://walkerever.github.io/)
 
-
 # xtable
 
 print console tables.  xtable serves as both a class and a command line tool.
+
+- [installation](#installation)
+- [use the class](#use-the-class)
+- [command line](#use-the-command-line)
+
+----
 
 
 ## Installation

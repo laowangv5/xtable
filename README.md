@@ -12,8 +12,8 @@ print console tables.  xtable serves as both a class and a command line tool.
 
 
 ## Installation
-    `pip install json_to_html`
-   run it through `json2html` or `python -mjson2html`
+    `pip install xtable`
+   run it through xtable` or `python -mxtable`
 
 ----
 

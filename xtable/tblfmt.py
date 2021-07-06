@@ -152,10 +152,10 @@ class xtable:
         if not self.__header  or not self.__data :
             return ""
         res = ""
-        width = [0 for _ in range(len(self.__header))]
+        width = [int(0) for _ in range(len(self.__header))]
         for r in ([self.__header] + self.__data) :
             for i, c in enumerate(r) :
-                if len(c) > width[i] :
+                if len(str(c)) > int(width[i]) :
                     width[i] = len(c)
         width = [max(4,w) for w in width]
         fmtstr = "| " + "|".join([" {:"+str(w)+"} " for w in width]) + " |"
@@ -323,6 +323,23 @@ def xtable_main():
     parser.add_argument( "-X", "--debug", dest="debug", action="store_true", default=False, help="debug mode",)
     args = parser.parse_args()
 
+    def showres(t) :
+        if args.pivot:
+            print(t.pivot())
+        else:
+            if args.format == "json":
+                print(t.json(), end="")
+            elif args.format == "yaml":
+                print(t.yaml(), end="")
+            elif args.format == "csv":
+                print(t.csv(), end="")
+            elif args.format == "html":
+                print(t.html(), end="")
+            elif args.format in ["md","markdown"]:
+                print(t.markdown(), end="")
+            else:
+                print(t, end="")
+
     colsdict = defaultdict()
     colsdict_revert = defaultdict()
     if args.column:
@@ -361,10 +378,7 @@ def xtable_main():
     if js :
         if type(js) is list :
             xt = xtable.init_from_json(js,args.header)
-            if args.pivot :
-                print(xt.pivot())
-            else :
-                print(xt)
+            showres(xt)
         sys.exit(0)
 
     for ln in INPUT:
@@ -414,31 +428,16 @@ def xtable_main():
                 v.append(v0)
             return v
         data = sorted(data, key=fsort)
-
-    if args.pivot:
-        print(xtable(header=oheader, data=data, cols=args.dumpcols).pivot())
-    else:
-        t = xtable(
-            header=oheader,
-            data=data,
-            cols=args.dumpcols,
-            maxcolwidth=args.maxcolwidth,
-            noheader=args.dataonly,
-            tree=args.tree,
-        )
-        if args.format == "json":
-            print(t.json(), end="")
-        elif args.format == "yaml":
-            print(t.yaml(), end="")
-        elif args.format == "csv":
-            print(t.csv(), end="")
-        elif args.format == "html":
-            print(t.html(), end="")
-        elif args.format in ["md","markdown"]:
-            print(t.markdown(), end="")
-        else:
-            print(t, end="")
-
+    xt = xtable(
+                header=oheader,
+                data=data,
+                cols=args.dumpcols,
+                maxcolwidth=args.maxcolwidth,
+                noheader=args.dataonly,
+                tree=args.tree,
+            )
+    showres(xt)
+    
 
 if __name__ == "__main__":
     xtable_main()

@@ -176,7 +176,7 @@ class xtable:
         width = [max(4,w) for w in width]
         fmtstr = "| " + "|".join([" {:"+str(w)+"} " for w in width]) + " |"
         res += (fmtstr.format(*self.__header)) + "\n"
-        res += (fmtstr.format(*(['----' for _ in width]))) + "\n"
+        res += (fmtstr.format(*(['-'*w for w in width]))) + "\n"
         for r in self.__data :
             if r :
                 res += (fmtstr.format(*r)) + "\n"
@@ -334,10 +334,11 @@ def xtable_main():
     parser.add_argument( "-w", "--maxcolwidth", dest="maxcolwidth", type=int, default=-1, help="max col width when print in console, min==20",)
     parser.add_argument( "-t", "--table", dest="table", action="store_true", default=False, help="input preformatted by spaces. header should not include spaces.",)
     parser.add_argument( "-v", "--pivot", dest="pivot", action="store_true", default=False, help="pivot wide tables.",)
-    parser.add_argument( "-T", "--tree", dest="tree", action="store_true", default=False, help="indicate the table is of tree struture",)
-    parser.add_argument("-F", "--format", dest="format", help="json,yaml,csv,html or md(markdown)")
-    parser.add_argument( "-d", "--dataonly", dest="dataonly", action="store_true", default=False, help="indicate there's no header",)
+    parser.add_argument("-F", "--tgtformat", dest="format", help="json,yaml,csv,html or md(markdown)")
     parser.add_argument( "-X", "--debug", dest="debug", action="store_true", default=False, help="debug mode",)
+    parser.add_argument( "--forcecsv", dest="forcecsv", action="store_true", default=False, help="treat input as CSV",)
+    parser.add_argument( "--dataonly", dest="dataonly", action="store_true", default=False, help="indicate there's no header",)
+    parser.add_argument( "--tree", dest="tree", action="store_true", default=False, help="indicate the table is of tree struture",)
     args = parser.parse_args()
 
     def showres(t) :
@@ -385,16 +386,17 @@ def xtable_main():
     if args.infile:
         INPUT = open(args.infile, "r") 
 
-    done = False
-    try :
-        xt = xtable.init_from_csv_fh(INPUT)
-        showres(xt)
-        done = True
-    except :
-        #traceback.print_exc()
-        pass
-    if done :
-        sys.exit(0)
+    if args.forcecsv :
+        done = False
+        try :
+            xt = xtable.init_from_csv_fh(INPUT)
+            showres(xt)
+            done = True
+        except :
+            traceback.print_exc()
+            pass
+        if done :
+            sys.exit(0)
 
     instr = INPUT.read()
     js = None

@@ -94,7 +94,7 @@ class xtable:
         csvfile = os.path.expanduser(csvfile)
         with open(csvfile,newline='') as cf :
             reader = csv.reader(cf, delimiter=delimiter, quotechar=quotechar)
-            data += [[c for c in r] for r in [row for row in reader]]
+            data += [[c for c in r] for r in reader if r ]
         if not header and len(data)>0:
             header = data[0]
             data = data[1:]
@@ -110,15 +110,11 @@ class xtable:
             else :
                 header = [ h for h in xheader.split(",") if h]
         reader = csv.reader(csvfh, delimiter=delimiter, quotechar=quotechar)
-        data += [[c for c in r] for r in [row for row in reader]]
+        data += [[c for c in r] for r in reader if r]
         if not header and len(data)>0:
             header = data[0]
             data = data[1:]
         return xtable(data,header)
-
-
-
-
 
     @staticmethod
     def init_from_json(xjson, xheader=None):
@@ -182,7 +178,8 @@ class xtable:
         res += (fmtstr.format(*self.__header)) + "\n"
         res += (fmtstr.format(*(['----' for _ in width]))) + "\n"
         for r in self.__data :
-            res += (fmtstr.format(*r)) + "\n"
+            if r :
+                res += (fmtstr.format(*r)) + "\n"
         return res
 
     def csv(self):
@@ -394,6 +391,7 @@ def xtable_main():
         showres(xt)
         done = True
     except :
+        #traceback.print_exc()
         pass
     if done :
         sys.exit(0)

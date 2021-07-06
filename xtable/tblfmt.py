@@ -101,6 +101,26 @@ class xtable:
         return xtable(data,header)
 
     @staticmethod
+    def init_from_csv_fh(csvfh, xheader=None, delimiter=',', quotechar='"'):
+        header=list()
+        data=list()
+        if xheader :
+            if type(xheader) is list :
+                header = xheader
+            else :
+                header = [ h for h in xheader.split(",") if h]
+        reader = csv.reader(csvfh, delimiter=delimiter, quotechar=quotechar)
+        data += [[c for c in r] for r in [row for row in reader]]
+        if not header and len(data)>0:
+            header = data[0]
+            data = data[1:]
+        return xtable(data,header)
+
+
+
+
+
+    @staticmethod
     def init_from_json(xjson, xheader=None):
         if type(xjson) is str and os.path.isfile(xjson) :
             xjson = open(xjson,"r").read()
@@ -366,16 +386,17 @@ def xtable_main():
     lno = 0
     INPUT = sys.stdin
     if args.infile:
-        iscsv = False
-        try :
-            xt = xtable.init_from_csv(args.infile)
-            showres(xt)
-            iscsv = True
-        except :
-            pass
-        if iscsv :
-            sys.exit(0)
         INPUT = open(args.infile, "r") 
+
+    done = False
+    try :
+        xt = xtable.init_from_csv_fh(INPUT)
+        showres(xt)
+        done = True
+    except :
+        pass
+    if done :
+        sys.exit(0)
 
     instr = INPUT.read()
     js = None

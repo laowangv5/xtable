@@ -148,6 +148,23 @@ class xtable:
             tbl.append(row)
         return yaml.safe_dump(tbl, default_flow_style=False)
 
+    def markdown(self):
+        if not self.__header  or not self.__data :
+            return ""
+        res = ""
+        width = [0 for _ in range(len(self.__header))]
+        for r in ([self.__header] + self.__data) :
+            for i, c in enumerate(r) :
+                if len(c) > width[i] :
+                    width[i] = len(c)
+        width = [max(4,w) for w in width]
+        fmtstr = "| " + "|".join([" {:"+str(w)+"} " for w in width]) + " |"
+        res += (fmtstr.format(*self.__header)) + "\n"
+        res += (fmtstr.format(*(['----' for _ in width]))) + "\n"
+        for r in self.__data :
+            res += (fmtstr.format(*r)) + "\n"
+        return res
+
     def csv(self):
         import io
         si = io.StringIO()
@@ -301,7 +318,7 @@ def xtable_main():
     parser.add_argument( "-t", "--table", dest="table", action="store_true", default=False, help="input preformatted by spaces. header should not include spaces.",)
     parser.add_argument( "-v", "--pivot", dest="pivot", action="store_true", default=False, help="pivot wide tables.",)
     parser.add_argument( "-T", "--tree", dest="tree", action="store_true", default=False, help="indicate the table is of tree struture",)
-    parser.add_argument("-F", "--format", dest="format", help="json,yaml,csv,html")
+    parser.add_argument("-F", "--format", dest="format", help="json,yaml,csv,html or md(markdown)")
     parser.add_argument( "-d", "--dataonly", dest="dataonly", action="store_true", default=False, help="indicate there's no header",)
     parser.add_argument( "-X", "--debug", dest="debug", action="store_true", default=False, help="debug mode",)
     args = parser.parse_args()
@@ -332,8 +349,7 @@ def xtable_main():
     lno = 0
     INPUT = sys.stdin
     if args.infile:
-        with open(args.infile, "r") as f:
-            INPUT = f.readlines()
+        INPUT = open(args.infile, "r") 
 
     instr = INPUT.read()
     js = None
@@ -341,6 +357,7 @@ def xtable_main():
         js = json.loads(instr)
     except :
         INPUT = instr.splitlines()
+
     if js :
         if type(js) is list :
             xt = xtable.init_from_json(js,args.header)
@@ -417,6 +434,8 @@ def xtable_main():
             print(t.csv(), end="")
         elif args.format == "html":
             print(t.html(), end="")
+        elif args.format in ["md","markdown"]:
+            print(t.markdown(), end="")
         else:
             print(t, end="")
 

@@ -366,6 +366,15 @@ def xtable_main():
     lno = 0
     INPUT = sys.stdin
     if args.infile:
+        iscsv = False
+        try :
+            xt = xtable.init_from_csv(args.infile)
+            showres(xt)
+            iscsv = True
+        except :
+            pass
+        if iscsv :
+            sys.exit(0)
         INPUT = open(args.infile, "r") 
 
     instr = INPUT.read()

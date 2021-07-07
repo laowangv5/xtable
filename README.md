@@ -6,7 +6,7 @@ print console tables.  xtable serves as both a class and a command line tool.
 
 - [installation](#installation)
 - [use the class](#use-the-class)
-- [command line](#use-the-command-line)
+- [command line](#use-the-command-line) from CSV, preformatted table, JSON list to console table, JSON, markdown and more.
 - [convert table data to Markdown](#markdown)
 
 ----

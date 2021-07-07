@@ -7,6 +7,7 @@ print console tables.  xtable serves as both a class and a command line tool.
 - [installation](#installation)
 - [use the class](#use-the-class)
 - [command line](#use-the-command-line)
+- [convert table data to Markdown](#markdown)
 
 ----
 
@@ -366,3 +367,79 @@ sql example 3 select Id, max(V1),max(V2),max(V3) from
               ) AG
                group by ID
 </pre>
+
+
+## markdown
+
+```
+yonghang@air xtable % cat test/t2.csv
+h1,h2,h3
+"asd","sdfsadf",1
+"c","cc",233
+
+yonghang@air xtable % cat test/t2.csv | xtable -F md
+|  h1,h2,h3           |
+|  -----------------  |
+|  "asd","sdfsadf",1  |
+|  "c","cc",233       |
+yonghang@air xtable %
+yonghang@air xtable % cat test/t1.txt
+a b c
+121 1212 12
+12 332  2323
+yonghang@air xtable % cat test/t1.txt | xtable -F md
+|  a    | b    | c     |
+|  ---- | ---- | ----  |
+|  121  | 1212 | 12    |
+|  12   | 332  | 2323  |
+yonghang@air xtable %
+yonghang@air xtable % cat test/t3.json | qic
+[
+  {
+    "userId": 1,
+    "firstName": "Krish",
+    "lastName": "Lee",
+    "phoneNumber": "123456",
+    "emailAddress": "krish.lee@learningcontainer.com"
+  },
+  {
+    "userId": 2,
+    "firstName": "racks",
+    "lastName": "jacson",
+    "phoneNumber": "123456",
+    "emailAddress": "racks.jacson@learningcontainer.com"
+  },
+  {
+    "userId": 3,
+    "firstName": "denial",
+    "lastName": "roast",
+    "phoneNumber": "33333333",
+    "emailAddress": "denial.roast@learningcontainer.com"
+  },
+  {
+    "userId": 4,
+    "firstName": "devid",
+    "lastName": "neo",
+    "phoneNumber": "222222222",
+    "emailAddress": "devid.neo@learningcontainer.com"
+  },
+  {
+    "userId": 5,
+    "firstName": "jone",
+    "lastName": "mac",
+    "phoneNumber": "111111111",
+    "emailAddress": "jone.mac@learningcontainer.com"
+  }
+]
+
+yonghang@air xtable %
+yonghang@air xtable % cat test/t3.json | xtable -F md
+|  userId | firstName | lastName | phoneNumber | emailAddress                        |
+|  ------ | --------- | -------- | ----------- | ----------------------------------  |
+|       1 | Krish     | Lee      | 123456      | krish.lee@learningcontainer.com     |
+|       2 | racks     | jacson   | 123456      | racks.jacson@learningcontainer.com  |
+|       3 | denial    | roast    | 33333333    | denial.roast@learningcontainer.com  |
+|       4 | devid     | neo      | 222222222   | devid.neo@learningcontainer.com     |
+|       5 | jone      | mac      | 111111111   | jone.mac@learningcontainer.com      |
+yonghang@air xtable %
+```

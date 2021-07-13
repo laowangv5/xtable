@@ -206,7 +206,7 @@ class xtable:
                         c = "0"
                     else :
                         c = ""
-                res += "<td>" + str(str(c).replace("\n", "<br>")) + "</td>\n"
+                res += "<td><pre>" + str(c) + "</pre></td>\n"
             res += "</tr>\n"
         return res
 

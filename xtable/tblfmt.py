@@ -81,6 +81,11 @@ class xtable:
                 self.__data = self.__data[1:self.__maxrows]
         self.__num_of_cols = len(self.__header)
 
+    def get_data(self) :
+        return self.__data
+    def get_header(self) :
+        return self.__header
+
     @staticmethod
     def init_from_csv(csvfile, xheader=None, delimiter=',', quotechar='"'):
         header=list()
@@ -390,6 +395,14 @@ def xtable_main():
         done = False
         try :
             xt = xtable.init_from_csv_fh(INPUT)
+            xt = xtable(
+                        header=xt.get_header(),
+                        data=xt.get_data(),
+                        cols=args.dumpcols,
+                        maxcolwidth=args.maxcolwidth,
+                        noheader=args.dataonly,
+                        tree=args.tree,
+                    )
             showres(xt)
             done = True
         except :
@@ -408,6 +421,14 @@ def xtable_main():
     if js :
         if type(js) is list :
             xt = xtable.init_from_json(js,args.header)
+            xt = xtable(
+                        header=xt.get_header(),
+                        data=xt.get_data(),
+                        cols=args.dumpcols,
+                        maxcolwidth=args.maxcolwidth,
+                        noheader=args.dataonly,
+                        tree=args.tree,
+                    )
             showres(xt)
         sys.exit(0)
 

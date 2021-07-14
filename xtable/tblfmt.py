@@ -60,10 +60,10 @@ def prepare_table(xjson,xheader=None) :
         return (data[1:],data[0])
 
 class xtable:
-    def __init__(self, data=None, header=None, cols=None, maxcolwidth=-1, noheader=False,tree=False,maxrows=2**30):
-        self.__maxcolwidth = int(maxcolwidth)
+    def __init__(self, data=None, header=None, cols=None, noheader=False,tree=False,maxrows=2**30, widthhint=None):
         self.__noheader = noheader
         self.__maxrows = maxrows
+        self.__widthhint = widthhint
         self.__tree = tree 
         self.__data = data or list()
         self.__header = header or list()
@@ -250,14 +250,8 @@ class xtable:
                     left = left[end:]
         return result
 
-    def __splitrow(self, row):
-        if self.__maxcolwidth < 20:
-            return zip_longest(*[c.splitlines() for c in row], fillvalue="")
-        else:
-            return zip_longest(
-                *[self.__splitstring(str(c), self.__maxcolwidth) for c in row],
-                fillvalue=""
-            )
+    def __splitrow(self, row, width):
+        return zip_longest(*[self.__splitstring(str(c), width[ix]) for ix,c in enumerate(row)], fillvalue="")
 
     def __repr__(self):
         width = [0 for _ in range(len(self.__header))]
@@ -273,8 +267,15 @@ class xtable:
                 wclen = self.__wcswidth_x(str(col))
                 if wclen > width[ix]:
                     width[ix] = wclen
-        if self.__maxcolwidth >= 20:
-            width = [min(w, self.__maxcolwidth) for w in width]
+        #"0:20,1:30"
+        if self.__widthhint :
+            for s in self.__widthhint.split(",") :
+                m = re.match(r"(\d+):(\d+)",s)
+                if m :
+                    ix = int(m.group(1))
+                    w = int(m.group(2))
+                    if 0 <= ix < len(width) and w > 0 :
+                        width[ix] = w
         twidth = copy.copy(width)
         for ix, w in enumerate(twidth):
             twidth[ix] = (
@@ -283,7 +284,8 @@ class xtable:
         fmtstr = "".join(["{:" + str(l + 1) + "}" for l in twidth])
         res = ""
         if not self.__noheader:
-            res += fmtstr.format(*self.__header).rstrip() + "\n"
+            xhdr =  [h[:width[i]] for i,h in enumerate(self.__header)]
+            res += fmtstr.format(*xhdr).rstrip() + "\n"
             res += ("-" * (sum(width) + len(width) - 1)) + "\n"
         oldrow = None
         for ix,r in enumerate(self.__data):
@@ -304,7 +306,7 @@ class xtable:
                     oldrow = r
             if len(row) < len(width):
                 row.extend([""] * (len(width) - len(row)))
-            for t in self.__splitrow(row):
+            for t in self.__splitrow(row,width):
                 twidth = copy.copy(width)
                 for ix, w in enumerate(twidth):
                     twidth[ix] = w - wcswidth(str(t[ix])) + len(str(t[ix]))
@@ -336,7 +338,7 @@ def xtable_main():
     parser.add_argument( "-C", "--dump-column", dest="dumpcols", help="only print columns indentified by index numbers.",)
     parser.add_argument( "-s", "--sortby", dest="sortby", help="column id starts with 0.")
     parser.add_argument( "-b", "--sep-char", dest="sepchar", default="\s+", help="char to seperate columns. note, default is SPACE, not ','",)
-    parser.add_argument( "-w", "--maxcolwidth", dest="maxcolwidth", type=int, default=-1, help="max col width when print in console, min==20",)
+    parser.add_argument( "-w", "--widthhint", dest="widthhint", default=None, help="hint for col width. '0:20,2:30,'",)
     parser.add_argument( "-t", "--table", dest="table", action="store_true", default=False, help="input preformatted by spaces. header should not include spaces.",)
     parser.add_argument( "-v", "--pivot", dest="pivot", action="store_true", default=False, help="pivot wide tables.",)
     parser.add_argument("-F", "--tgtformat", dest="format", help="json,yaml,csv,html or md(markdown)")
@@ -399,9 +401,9 @@ def xtable_main():
                         header=xt.get_header(),
                         data=xt.get_data(),
                         cols=args.dumpcols,
-                        maxcolwidth=args.maxcolwidth,
                         noheader=args.dataonly,
                         tree=args.tree,
+                        widthhint=args.widthhint,
                     )
             showres(xt)
             done = True
@@ -425,9 +427,9 @@ def xtable_main():
                         header=xt.get_header(),
                         data=xt.get_data(),
                         cols=args.dumpcols,
-                        maxcolwidth=args.maxcolwidth,
                         noheader=args.dataonly,
                         tree=args.tree,
+                        widthhint=args.widthhint,
                     )
             showres(xt)
         sys.exit(0)
@@ -483,12 +485,12 @@ def xtable_main():
                 header=oheader,
                 data=data,
                 cols=args.dumpcols,
-                maxcolwidth=args.maxcolwidth,
                 noheader=args.dataonly,
                 tree=args.tree,
+                widthhint=args.widthhint,
             )
     showres(xt)
     
 
 if __name__ == "__main__":
-    xtable_main()
+    ()

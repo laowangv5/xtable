@@ -10,7 +10,7 @@ README = (HERE / "README.md").read_text()
 # This call to setup() does all the work
 setup(
     name="xtable",
-    version="1.0.12",
+    version="1.0.13",
     description="operate table format in console. console table, csv, json, yaml and markdown.",
     long_description=README,
     long_description_content_type="text/markdown",
@@ -21,7 +21,7 @@ setup(
     classifiers=["License :: OSI Approved :: Apache Software License"],
     packages=find_packages(),
     include_package_data=True,
-    install_requires=[ "wcwidth"],
+    install_requires=[ "wcwidth","colorama","qic"],
     keywords=[ "xtable","table","simpletable","quicktable" ],
     entry_points={ "console_scripts": 
         [ 

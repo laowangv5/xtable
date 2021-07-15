@@ -12,7 +12,8 @@ import traceback
 from wcwidth import wcswidth
 from collections import defaultdict
 from itertools import zip_longest
-
+from colorama import Fore, Back, Style
+from qic import commandline
 
 def prepare_table(xjson,xheader=None) :
     header=list()
@@ -254,6 +255,21 @@ class xtable:
         return zip_longest(*[self.__splitstring(str(c), width[ix]) for ix,c in enumerate(row)], fillvalue="")
 
     def __repr__(self):
+        def supports_color():
+            plat = sys.platform
+            supported_platform = plat != 'Pocket PC' and (plat != 'win32' or 'ANSICON' in os.environ)
+            is_a_tty = hasattr(sys.stdout, 'isatty') and sys.stdout.isatty()
+            m = re.search(r"^xterm",os.environ.get("TERM","n/a"),re.IGNORECASE)
+            try :
+                ret,out,err = commandline.qx("uname -s")
+            except :
+                return False
+            iscygwin = re.search(r"cygwin",out,re.IGNORECASE)
+            return (is_a_tty or iscygwin) and (m or supported_platform)
+        if supports_color() or os.environ.get("force_ansicolor","").lower() in ["true","yes","y","1"] :
+            colored = True
+        else :
+            colored = False
         width = [0 for _ in range(len(self.__header))]
         for row in self.__data + [self.__header]:
             for ix, col in enumerate(row):
@@ -285,11 +301,18 @@ class xtable:
         res = ""
         if not self.__noheader:
             xhdr =  [h[:width[i]] for i,h in enumerate(self.__header)]
-            res += fmtstr.format(*xhdr).rstrip() + "\n"
-            res += ("-" * (sum(width) + len(width) - 1)) + "\n"
+            if colored :
+                res += Fore.MAGENTA + fmtstr.format(*xhdr).rstrip() + "\n"
+                #res += Fore.RESET + ("-" * (sum(width) + len(width) - 1)) + "\n"
+                res += Fore.RESET + " ".join(['-'*(int(w)-1)+" " for w in width]) + "\n"
+            else :
+                res += fmtstr.format(*xhdr).rstrip() + "\n"
+                #res += ("-" * (sum(width) + len(width) - 1)) + "\n"
+                res += " ".join(['-'*(int(w)-1)+" " for w in width]) + "\n"
         oldrow = None
-        for ix,r in enumerate(self.__data):
-            if ix == 0 :
+        forecolors=[Fore.BLUE,Fore.GREEN]
+        for rn,r in enumerate(self.__data):
+            if rn == 0 :
                 row = [str(c) if c or c==0 else "" for c in r]
                 oldrow = r
             else :
@@ -311,9 +334,11 @@ class xtable:
                 for ix, w in enumerate(twidth):
                     twidth[ix] = w - wcswidth(str(t[ix])) + len(str(t[ix]))
                 fmtstr = "".join(["{:" + str(l + 1) + "}" for l in twidth])
-                res += fmtstr.format(*t).rstrip() + "\n"
+                if colored :
+                    res += forecolors[rn%2] + fmtstr.format(*t).rstrip() + "\n"
+                else :
+                    res += fmtstr.format(*t).rstrip() + "\n"
         return res
-
 
 def tokenize(s):
     offset = 0

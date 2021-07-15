@@ -338,6 +338,8 @@ class xtable:
                     res += forecolors[rn%2] + fmtstr.format(*t).rstrip() + "\n"
                 else :
                     res += fmtstr.format(*t).rstrip() + "\n"
+        if colored :
+            res += Fore.RESET
         return res
 
 def tokenize(s):

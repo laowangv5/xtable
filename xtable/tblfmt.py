@@ -9,6 +9,7 @@ import csv
 import copy
 import json
 import traceback
+import string
 from wcwidth import wcswidth
 from collections import defaultdict
 from itertools import zip_longest
@@ -247,8 +248,11 @@ class xtable:
                 while left:
                     start = 0
                     end = min(maxcolwidth, len(left))
-                    while wcswidth(left[start:end]) > maxcolwidth:
+                    oldend = end
+                    while end > start and (wcswidth(left[start:end]) > maxcolwidth or left[end-1] not in string.punctuation+string.whitespace ):
                         end -= 1
+                    if end == start :
+                        end = oldend
                     result.append(left[start:end])
                     left = left[end:]
         return result

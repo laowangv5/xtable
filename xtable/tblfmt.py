@@ -293,7 +293,7 @@ class xtable:
                 if m :
                     ix = int(m.group(1))
                     w = int(m.group(2))
-                    if 0 <= ix < len(width) and w > 0 :
+                    if 0 <= ix < len(width) and w > 0 and w < width[ix] :
                         width[ix] = w
         twidth = copy.copy(width)
         for ix, w in enumerate(twidth):
@@ -306,14 +306,28 @@ class xtable:
         if not self.__noheader:
             xhdr =  [h[:width[i]] for i,h in enumerate(self.__header)]
             if colored :
-                res += color(fmtstr.format(*xhdr).rstrip(),fg=61) + "\n"
+                hcolor = os.environ.get("xtable_header_color","21")
+                m = re.search(r"(\d+)",hcolor)
+                if m :
+                    hc = int(m.group(1))
+                else :
+                    hc = 21
+                res += '\033[1m' + color(fmtstr.format(*xhdr).rstrip(),fg=hc) + '\033[0m' + "\n"
                 res += "|".join(['-'*(int(w)) for w in width]) + "\n"
             else :
                 res += fmtstr.format(*xhdr).rstrip() + "\n"
                 res += "|".join(['-'*(int(w)) for w in width]) + "\n"
             headlines = res
         oldrow = None
-        forecolors=[lambda x:color(str(x),fg=244),lambda x:color(str(x),fg=254)]
+        rcolor = os.environ.get("xtable_rows_color","58:95")
+        m = re.search(r"(\d+):(\d+)",rcolor)
+        if m :
+            c1 = int(m.group(1))
+            c2 = int(m.group(2))
+        else :
+            c1 = 58
+            c1 = 95
+        forecolors=[lambda x:color(str(x),fg=c1),lambda x:color(str(x),fg=c2)]
         for rn,r in enumerate(self.__data):
             if rn != 0 and rn % self.__rowperpage == 0 :
                 res += headlines
@@ -377,7 +391,17 @@ def xtable_main():
     parser.add_argument( "--forcecsv", dest="forcecsv", action="store_true", default=False, help="treat input as CSV",)
     parser.add_argument( "--dataonly", dest="dataonly", action="store_true", default=False, help="indicate there's no header",)
     parser.add_argument( "--tree", dest="tree", action="store_true", default=False, help="indicate the table is of tree struture",)
+    parser.add_argument( "--colors", dest="colors", action="store_true", default=False, help="show colors for xtable_header/rows_color",)
     args = parser.parse_args()
+
+    def showcolors() :
+        for i in range(256) :
+            print(color('Color {:3}  '.format(i), fg=i), end="")
+            if (i+1)%8 == 0 :
+                print("")
+    if args.colors :
+        showcolors()
+        sys.exit(0)
 
     def showres(t) :
         if args.pivot:

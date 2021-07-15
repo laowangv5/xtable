@@ -268,9 +268,10 @@ class xtable:
                 return False
             iscygwin = re.search(r"cygwin",out,re.IGNORECASE)
             return (is_a_tty or iscygwin) and (m or supported_platform)
+        colored = False
         if supports_color() or os.environ.get("force_ansicolor","").lower() in ["true","yes","y","1"] :
             colored = True
-        else :
+        if os.environ.get("force_ansicolor","").lower() in ["false","no","n","0"] :
             colored = False
         width = [0 for _ in range(len(self.__header))]
         for row in self.__data + [self.__header]:

@@ -426,7 +426,7 @@ def xtable_main():
     if args.forcecsv :
         done = False
         try :
-            xt = xtable.init_from_csv_fh(INPUT)
+            xt = xtable.init_from_csv_fh(INPUT,delimiter=args.sepchar)
             xt = xtable(
                         header=xt.get_header(),
                         data=xt.get_data(),

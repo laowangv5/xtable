@@ -12,7 +12,8 @@ import traceback
 from wcwidth import wcswidth
 from collections import defaultdict
 from itertools import zip_longest
-from colorama import Fore, Back, Style
+#from colorama import Fore, Back, Style
+from colors import color
 from qic import commandline
 
 def prepare_table(xjson,xheader=None) :
@@ -61,9 +62,10 @@ def prepare_table(xjson,xheader=None) :
         return (data[1:],data[0])
 
 class xtable:
-    def __init__(self, data=None, header=None, cols=None, noheader=False,tree=False,maxrows=2**30, widthhint=None):
+    def __init__(self, data=None, header=None, cols=None, noheader=False,tree=False,maxrows=2**30, widthhint=None,rowperpage=2**30):
         self.__noheader = noheader
         self.__maxrows = maxrows
+        self.__rowperpage = rowperpage or 2**30
         self.__widthhint = widthhint
         self.__tree = tree 
         self.__data = data or list()
@@ -299,19 +301,21 @@ class xtable:
             )
         fmtstr = "".join(["{:" + str(l + 1) + "}" for l in twidth])
         res = ""
+        headlines=""
         if not self.__noheader:
             xhdr =  [h[:width[i]] for i,h in enumerate(self.__header)]
             if colored :
-                res += Fore.MAGENTA + fmtstr.format(*xhdr).rstrip() + "\n"
-                #res += Fore.RESET + ("-" * (sum(width) + len(width) - 1)) + "\n"
-                res += Fore.RESET + " ".join(['-'*(int(w)-1)+" " for w in width]) + "\n"
+                res += color(fmtstr.format(*xhdr).rstrip(),fg=61) + "\n"
+                res += "|".join(['-'*(int(w)) for w in width]) + "\n"
             else :
                 res += fmtstr.format(*xhdr).rstrip() + "\n"
-                #res += ("-" * (sum(width) + len(width) - 1)) + "\n"
-                res += " ".join(['-'*(int(w)-1)+" " for w in width]) + "\n"
+                res += "|".join(['-'*(int(w)) for w in width]) + "\n"
+            headlines = res
         oldrow = None
-        forecolors=[Fore.BLUE,Fore.GREEN]
+        forecolors=[lambda x:color(str(x),fg=244),lambda x:color(str(x),fg=254)]
         for rn,r in enumerate(self.__data):
+            if rn != 0 and rn % self.__rowperpage == 0 :
+                res += headlines
             if rn == 0 :
                 row = [str(c) if c or c==0 else "" for c in r]
                 oldrow = r
@@ -335,11 +339,9 @@ class xtable:
                     twidth[ix] = w - wcswidth(str(t[ix])) + len(str(t[ix]))
                 fmtstr = "".join(["{:" + str(l + 1) + "}" for l in twidth])
                 if colored :
-                    res += forecolors[rn%2] + fmtstr.format(*t).rstrip() + "\n"
+                    res += forecolors[rn%2](fmtstr.format(*t).rstrip()) + "\n"
                 else :
                     res += fmtstr.format(*t).rstrip() + "\n"
-        if colored :
-            res += Fore.RESET
         return res
 
 def tokenize(s):
@@ -366,6 +368,7 @@ def xtable_main():
     parser.add_argument( "-s", "--sortby", dest="sortby", help="column id starts with 0.")
     parser.add_argument( "-b", "--sep-char", dest="sepchar", default="\s+", help="char to seperate columns. note, default is SPACE, not ','",)
     parser.add_argument( "-w", "--widthhint", dest="widthhint", default=None, help="hint for col width. '0:20,2:30,'",)
+    parser.add_argument( "-p", "--page", dest="page", type=int,default=2**30, help="rows per page. print header line again",)
     parser.add_argument( "-t", "--table", dest="table", action="store_true", default=False, help="input preformatted by spaces. header should not include spaces.",)
     parser.add_argument( "-v", "--pivot", dest="pivot", action="store_true", default=False, help="pivot wide tables.",)
     parser.add_argument("-F", "--tgtformat", dest="format", help="json,yaml,csv,html or md(markdown)")
@@ -431,6 +434,7 @@ def xtable_main():
                         noheader=args.dataonly,
                         tree=args.tree,
                         widthhint=args.widthhint,
+                        rowperpage=args.page,
                     )
             showres(xt)
             done = True
@@ -457,6 +461,7 @@ def xtable_main():
                         noheader=args.dataonly,
                         tree=args.tree,
                         widthhint=args.widthhint,
+                        rowperpage=args.page,
                     )
             showres(xt)
         sys.exit(0)
@@ -515,6 +520,7 @@ def xtable_main():
                 noheader=args.dataonly,
                 tree=args.tree,
                 widthhint=args.widthhint,
+                rowperpage=args.page,
             )
     showres(xt)
     

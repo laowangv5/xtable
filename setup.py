@@ -21,7 +21,7 @@ setup(
     classifiers=["License :: OSI Approved :: Apache Software License"],
     packages=find_packages(),
     include_package_data=True,
-    install_requires=[ "wcwidth","ansicolor","qic"],
+    install_requires=[ "wcwidth","ansicolors","qic"],
     keywords=[ "xtable","table","simpletable","quicktable" ],
     entry_points={ "console_scripts": 
         [ 

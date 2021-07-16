@@ -17,6 +17,7 @@ from itertools import zip_longest
 from colors import color
 from qic import commandline
 
+
 def prepare_table(xjson,xheader=None) :
     header=list()
     if xheader :
@@ -51,8 +52,8 @@ def prepare_table(xjson,xheader=None) :
                     r.append(row.get(h,""))
                 data.append(r)
         else :
-            print("# not supported format.")
-            print(json.dumps(js,indent=2))
+            print("# not supported format.",file=sys.stderr,flush=True)
+            print(json.dumps(js,indent=2),file=sys.stderr,flush=True)
             return (None,None)
     except:
         traceback.print_exc()
@@ -452,6 +453,11 @@ def xtable_main():
     if args.infile:
         INPUT = open(args.infile, "r") 
 
+    def dump_xtable(xt) :
+        res = ("# xtable.header = ", json.dumps(xt.get_header())) + "\n"
+        res += ("# xtable.data   = ", json.dumps(xt.get_data())) 
+        return
+        
     if args.forcecsv :
         done = False
         try :
@@ -465,6 +471,8 @@ def xtable_main():
                         widthhint=args.widthhint,
                         rowperpage=args.page,
                     )
+            if args.debug :
+                print(dump_xtable(xt),file=sys.stderr,flush=True)
             showres(xt)
             done = True
         except :
@@ -492,6 +500,8 @@ def xtable_main():
                         widthhint=args.widthhint,
                         rowperpage=args.page,
                     )
+            if args.debug :
+                print(dump_xtable(xt),file=sys.stderr,flush=True)
             showres(xt)
         sys.exit(0)
 
@@ -551,6 +561,8 @@ def xtable_main():
                 widthhint=args.widthhint,
                 rowperpage=args.page,
             )
+    if args.debug :
+        dump_xtable(xt)
     showres(xt)
     
 

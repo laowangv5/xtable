@@ -380,17 +380,16 @@ def tokenize(s):
 
 def xtable_main():
     parser = argparse.ArgumentParser()
-    parser.add_argument( "-n", "--lineno", dest="lineno", default=False, action="store_true", help="show line no.",)
     parser.add_argument("-H", "--header", dest="header", help="header columns")
     parser.add_argument("-f", "--infile", dest="infile", help="input file")
-    parser.add_argument( "-c", "--column", action="append", dest="column", help="column names. used when there're spaces within.",)
     parser.add_argument( "-C", "--dump-column", dest="dumpcols", help="only print columns indentified by index numbers.",)
-    parser.add_argument( "-s", "--sortby", dest="sortby", help="column id starts with 0.")
     parser.add_argument( "-b", "--sep-char", dest="sepchar", default="\s+", help="char to seperate columns. note, default is SPACE, not ','",)
     parser.add_argument( "-w", "--widthhint", dest="widthhint", default=None, help="hint for col width. '0:20,2:30,'",)
     parser.add_argument( "-p", "--page", dest="page", type=int,default=2**30, help="rows per page. print header line again",)
     parser.add_argument( "-t", "--table", dest="table", action="store_true", default=False, help="input preformatted by spaces. header should not include spaces.",)
+    parser.add_argument( "-c", "--column", action="append", dest="column", help="column names. used when there're spaces within.",)
     parser.add_argument( "-v", "--pivot", dest="pivot", action="store_true", default=False, help="pivot wide tables.",)
+    parser.add_argument( "-s", "--sortby", dest="sortby", help="column id starts with 0.")
     parser.add_argument("-F", "--tgtformat", dest="format", help="json,yaml,csv,html or md(markdown)")
     parser.add_argument( "-X", "--debug", dest="debug", action="store_true", default=False, help="debug mode",)
     parser.add_argument( "--forcecsv", dest="forcecsv", action="store_true", default=False, help="treat input as CSV",)
@@ -398,6 +397,8 @@ def xtable_main():
     parser.add_argument( "--tree", dest="tree", action="store_true", default=False, help="indicate the table is of tree struture",)
     parser.add_argument( "--colors", dest="colors", action="store_true", default=False, help="show colors for xtable_header/rows_color",)
     args = parser.parse_args()
+
+    _args_lineno = False # disabled option
 
     def showcolors() :
         for i in range(256) :
@@ -438,7 +439,7 @@ def xtable_main():
             args.header = re.sub(c, nc, args.header)
     xheader = None
     header = list()
-    if args.lineno:
+    if _args_lineno:
         header.append("#")
     if args.header:
         mhdr = args.header
@@ -520,17 +521,17 @@ def xtable_main():
                 for c, nc in colsdict.items():
                     ln = re.sub(c, nc, ln)
                 xheader = tokenize(ln)
-                if args.lineno:
+                if _args_lineno:
                     header = ["#"] + [v.rstrip() for (s, t, v) in xheader]
                 else:
                     header = [v.rstrip() for (s, t, v) in xheader]
                 continue
-        if len(header) == 0 or (args.lineno and len(header) == 1):
+        if len(header) == 0 or (_args_lineno and len(header) == 1):
             if not args.table:
                 header.extend(arr)
         else:
             lno += 1
-            if args.lineno:
+            if _args_lineno:
                 data.append([str(lno)] + arr)
             else:
                 data.append(arr)
@@ -567,4 +568,4 @@ def xtable_main():
     
 
 if __name__ == "__main__":
-    ()
+    xtable_main()

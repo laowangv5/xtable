@@ -317,10 +317,10 @@ class xtable:
                     hc = int(m.group(1))
                 else :
                     hc = 21
-                res += '\033[1m' + color(fmtstr.format(*xhdr).rstrip(),fg=hc) + '\033[0m' + "\n"
+                res += '\033[1m' + color(fmtstr.format(*xhdr).strip(),fg=hc) + '\033[0m' + "\n"
                 res += "|".join(['-'*(int(w)) for w in width]) + "\n"
             else :
-                res += fmtstr.format(*xhdr).rstrip() + "\n"
+                res += fmtstr.format(*xhdr).strip() + "\n"
                 res += "|".join(['-'*(int(w)) for w in width]) + "\n"
             headlines = res
         oldrow = None
@@ -370,7 +370,7 @@ def tokenize(s):
     while True:
         m = re.search(r"\S+\s*", s[offset:])
         if m:
-            tokens.append([offset + m.start(), offset + m.end(), m.group().rstrip()])
+            tokens.append([offset + m.start(), offset + m.end(), m.group().strip()])
             offset += m.end()
         else:
             break
@@ -447,7 +447,7 @@ def xtable_main():
             header.extend(re.split(r"{}".format(args.sepchar), mhdr))
         else:
             xheader = tokenize(mhdr)
-            header = [v.rstrip() for (s, t, v) in xheader]
+            header = [v.strip() for (s, t, v) in xheader]
     data = list()
     lno = 0
     INPUT = sys.stdin
@@ -513,18 +513,18 @@ def xtable_main():
             for c, nc in colsdict.items():
                 ln = re.sub(c, nc, ln)
         if not args.table:
-            arr = re.split(r"{}".format(args.sepchar), ln.rstrip())
+            arr = re.split(r"{}".format(args.sepchar), ln.strip())
         else:
             if xheader:
-                arr = [ln[s:t].rstrip() for (s, t, v) in xheader]
+                arr = [ln[s:t].strip() for (s, t, v) in xheader]
             else:
                 for c, nc in colsdict.items():
                     ln = re.sub(c, nc, ln)
                 xheader = tokenize(ln)
                 if _args_lineno:
-                    header = ["#"] + [v.rstrip() for (s, t, v) in xheader]
+                    header = ["#"] + [v.strip() for (s, t, v) in xheader]
                 else:
-                    header = [v.rstrip() for (s, t, v) in xheader]
+                    header = [v.strip() for (s, t, v) in xheader]
                 continue
         if len(header) == 0 or (_args_lineno and len(header) == 1):
             if not args.table:

@@ -64,7 +64,7 @@ def prepare_table(xjson,xheader=None) :
         return (data[1:],data[0])
 
 class xtable:
-    def __init__(self, data=None, header=None, cols=None, noheader=False,tree=False,maxrows=2**30, widthhint=None,rowperpage=2**30):
+    def __init__(self, data=None, header=None, cols=None, noheader=False,tree=False,maxrows=2**30, widthhint=None,rowperpage=2**30,debug=False):
         self.__noheader = noheader
         self.__maxrows = maxrows
         self.__rowperpage = rowperpage or 2**30
@@ -85,6 +85,7 @@ class xtable:
                 self.__header = self.__data[0]
                 self.__data = self.__data[1:self.__maxrows]
         self.__num_of_cols = len(self.__header)
+        self.__debug = debug
 
     def get_data(self) :
         return self.__data
@@ -262,6 +263,9 @@ class xtable:
         return zip_longest(*[self.__splitstring(str(c), width[ix]) for ix,c in enumerate(row)], fillvalue="")
 
     def __repr__(self):
+        if self.__debug :
+            print("# self.__header = ",self.__header, file=sys.stderr, flush=True)
+            print("# self.__data = \n",self.__data, file=sys.stderr, flush=True)
         def supports_color():
             plat = sys.platform
             supported_platform = plat != 'Pocket PC' and (plat != 'win32' or 'ANSICON' in os.environ)
@@ -561,6 +565,7 @@ def xtable_main():
                 tree=args.tree,
                 widthhint=args.widthhint,
                 rowperpage=args.page,
+                debug=args.debug
             )
     if args.debug :
         dump_xtable(xt)

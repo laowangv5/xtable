@@ -260,7 +260,7 @@ class xtable:
         return result
 
     def __splitrow(self, row, width):
-        return zip_longest(*[self.__splitstring(str(c), width[ix]) for ix,c in enumerate(row)], fillvalue="")
+        return zip_longest(*[self.__splitstring(str(c), width[ix]) for ix,c in enumerate(row) if ix<len(width)], fillvalue="")
 
     def __repr__(self):
         if self.__debug :

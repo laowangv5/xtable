@@ -378,7 +378,7 @@ def tokenize(s):
             offset += m.end()
         else:
             break
-    tokens[-1][1] = -1
+    tokens[-1][1] += 9999
     return tokens
 
 
@@ -459,8 +459,8 @@ def xtable_main():
         INPUT = open(args.infile, "r") 
 
     def dump_xtable(xt) :
-        res = ("# xtable.header = ", json.dumps(xt.get_header())) + "\n"
-        res += ("# xtable.data   = ", json.dumps(xt.get_data())) 
+        res =  "# xtable.header : " +  json.dumps(xt.get_header()) + "\n"
+        res += "# xtable.data   : " +  json.dumps(xt.get_data())  
         return
         
     if args.forcecsv :

@@ -186,10 +186,12 @@ class xtable:
                     width[i] = len(c)
         width = [max(4,w) for w in width]
         fmtstr = "| " + "|".join([" {:"+str(w)+"} " for w in width]) + " |"
+        print(fmtstr)
         res += (fmtstr.format(*self.__header)) + "\n"
         res += (fmtstr.format(*(['-'*w for w in width]))) + "\n"
         for r in self.__data :
             if r :
+                r = [c if c else '' for c in r]
                 res += (fmtstr.format(*r)) + "\n"
         return res
 

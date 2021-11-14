@@ -258,6 +258,9 @@ class xtable:
 
     def __splitstring(self, s, maxcolwidth):
         result = list()
+        if self.__superwrap :
+            result.append(s)
+            return result
         for ln in s.splitlines():
             if wcswidth(ln) <= maxcolwidth:
                 result.append(ln)

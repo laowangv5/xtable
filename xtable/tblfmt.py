@@ -64,9 +64,10 @@ def prepare_table(xjson,xheader=None) :
         return (data[1:],data[0])
 
 class xtable:
-    def __init__(self, data=None, header=None, cols=None, noheader=False,tree=False,maxrows=2**30, widthhint=None,rowperpage=2**30,debug=False):
+    def __init__(self, data=None, header=None, cols=None, noheader=False,tree=False,maxrows=2**30, widthhint=None,rowperpage=2**30,debug=False,superwrap=False):
         self.__noheader = noheader
         self.__maxrows = maxrows
+        self.__superwrap = superwrap
         self.__rowperpage = rowperpage or 2**30
         self.__widthhint = widthhint
         self.__tree = tree 
@@ -284,6 +285,9 @@ class xtable:
             colored = True
         if os.environ.get("force_ansicolor","").lower() in ["false","no","n","0"] :
             colored = False
+        if self.__superwrap :
+            colored = False
+            self.__widthhint = None
         width = [0 for _ in range(len(self.__header))]
         for row in self.__data + [self.__header]:
             for ix, col in enumerate(row):
@@ -311,7 +315,19 @@ class xtable:
             twidth[ix] = (
                 w - wcswidth(str(self.__header[ix])) + len(str(self.__header[ix]))
             )
-        fmtstr = "".join(["{:" + str(l + 1) + "}" for l in twidth])
+        if self.__superwrap :
+            termwidth = os.get_terminal_size().columns
+            fmtstr = ""
+            curw = 0
+            for l in twidth :
+                if curw + (l+1) > termwidth and curw != 0 :
+                    fmtstr += "\\n"
+                    curw = 0
+                fmtstr += "{:" + str(l + 1) + "}"
+                curw += (l+1)
+        else :
+            fmtstr = "".join(["{:" + str(l + 1) + "}" for l in twidth])
+        xfmtstr = fmtstr
         res = ""
         headlines=""
         if not self.__noheader:
@@ -326,8 +342,9 @@ class xtable:
                 res += '\033[1m' + color(fmtstr.format(*xhdr).strip(),fg=hc) + '\033[0m' + "\n"
                 res += "|".join(['-'*(int(w)) for w in width]) + "\n"
             else :
-                res += fmtstr.format(*xhdr).strip() + "\n"
-                res += "|".join(['-'*(int(w)) for w in width]) + "\n"
+                if not self.__superwrap :
+                    res += fmtstr.format(*xhdr).strip() + "\n"
+                    res += "|".join(['-'*(int(w)) for w in width]) + "\n"
             headlines = res
         oldrow = None
         rcolor = os.environ.get("xtable_rows_color","58:95")
@@ -340,7 +357,10 @@ class xtable:
             c1 = 95
         forecolors=[lambda x:color(str(x),fg=c1),lambda x:color(str(x),fg=c2)]
         for rn,r in enumerate(self.__data):
-            if rn != 0 and rn % self.__rowperpage == 0 :
+            if rn != 0 and self.__superwrap :
+                #res += "="*(os.get_terminal_size().columns-1)+"\n"
+                res += "\n"
+            if rn != 0 and rn % self.__rowperpage == 0  and not self.__superwrap:
                 res += headlines
             if rn == 0 :
                 row = [str(c) if c or c==0 else "" for c in r]
@@ -367,7 +387,17 @@ class xtable:
                 if colored :
                     res += forecolors[rn%2](fmtstr.format(*t).rstrip()) + "\n"
                 else :
-                    res += fmtstr.format(*t).rstrip() + "\n"
+                    if self.__superwrap :
+                        xhdr =  [h[:width[i]] for i,h in enumerate(self.__header)]
+                        hdrs = xfmtstr.format(*xhdr).strip().split("\\n")
+                        bars = xfmtstr.format(*(['-'*(int(w)) for w in width])).split("\\n")
+                        newstr = xfmtstr.format(*t).rstrip().split("\\n")
+                        for i in range(len(hdrs)) :
+                            res += (hdrs[i]) + "\n"
+                            res += (bars[i]) + "\n"
+                            res += (newstr[i]) + "\n"
+                    else :
+                        res += fmtstr.format(*t).rstrip() + "\n"
         return res
 
 def tokenize(s):
@@ -401,6 +431,7 @@ def xtable_main():
     parser.add_argument( "--forcecsv", dest="forcecsv", action="store_true", default=False, help="treat input as CSV",)
     parser.add_argument( "--dataonly", dest="dataonly", action="store_true", default=False, help="indicate there's no header",)
     parser.add_argument( "--tree", dest="tree", action="store_true", default=False, help="indicate the table is of tree struture",)
+    parser.add_argument( "--superwrap", dest="superwrap", action="store_true", default=False, help="super wrap mode",)
     parser.add_argument( "--colors", dest="colors", action="store_true", default=False, help="show colors for xtable_header/rows_color",)
     args = parser.parse_args()
 
@@ -477,6 +508,7 @@ def xtable_main():
                         tree=args.tree,
                         widthhint=args.widthhint,
                         rowperpage=args.page,
+                        superwrap=args.superwrap,
                     )
             if args.debug :
                 print(dump_xtable(xt),file=sys.stderr,flush=True)
@@ -506,6 +538,7 @@ def xtable_main():
                         tree=args.tree,
                         widthhint=args.widthhint,
                         rowperpage=args.page,
+                        superwrap=args.superwrap,
                     )
             if args.debug :
                 print(dump_xtable(xt),file=sys.stderr,flush=True)
@@ -567,7 +600,8 @@ def xtable_main():
                 tree=args.tree,
                 widthhint=args.widthhint,
                 rowperpage=args.page,
-                debug=args.debug
+                debug=args.debug,
+                superwrap=args.superwrap,
             )
     if args.debug :
         dump_xtable(xt)

@@ -75,10 +75,12 @@ class xtable:
                  widthhint=None,
                  rowperpage=2**30,
                  debug=False,
-                 superwrap=False):
+                 superwrap=False,
+                 cutwrap=False):
         self.__noheader = noheader
         self.__maxrows = maxrows
         self.__superwrap = superwrap
+        self.__cutwrap = cutwrap
         self.__rowperpage = rowperpage or 2**30
         self.__widthhint = widthhint
         self.__tree = tree
@@ -363,6 +365,7 @@ class xtable:
         xfmtstr = fmtstr
         res = ""
         headlines = ""
+        columns = os.get_terminal_size().columns
         if not self.__noheader:
             xhdr = [h[:width[i]] for i, h in enumerate(self.__header)]
             if colored:
@@ -373,9 +376,10 @@ class xtable:
                 else:
                     hc = 21
                 if not self.__superwrap:
-                    res += '\033[1m' + color(fmtstr.format(*xhdr).strip(),
+                    maxcols = columns if self.__cutwrap else 2**20
+                    res += '\033[1m' + color(fmtstr.format(*xhdr).strip()[:maxcols],
                                              fg=hc) + '\033[0m' + "\n"
-                    res += "|".join(['-' * (int(w)) for w in width]) + "\n"
+                    res += "|".join(['-' * (int(w)) for w in width])[:maxcols] + "\n"
             else:
                 if not self.__superwrap:
                     res += fmtstr.format(*xhdr).strip() + "\n"
@@ -416,7 +420,6 @@ class xtable:
                     oldrow = r
             if len(row) < len(width):
                 row.extend([""] * (len(width) - len(row)))
-            columns = os.get_terminal_size().columns
             headershown = False
             for t in self.__splitrow(row, width):
                 twidth = copy.copy(width)
@@ -437,8 +440,8 @@ class xtable:
                         headershown = True
                         #res += "\n"
                     else:
-                        res += forecolors[rn % 2](
-                            fmtstr.format(*t).rstrip()) + "\n"
+                        maxcols = columns if self.__cutwrap else 2**20
+                        res += forecolors[rn % 2](fmtstr.format(*t).rstrip()[:maxcols]) + "\n"
                 else:
                     if self.__superwrap:
                         hdrs = xfmtstr.format(*xhdr).strip().split("\\n")
@@ -453,7 +456,8 @@ class xtable:
                         headershown = True
                         #res += "\n"
                     else:
-                        res += fmtstr.format(*t).rstrip() + "\n"
+                        maxcols = columns if self.__cutwrap else 2**20
+                        res += fmtstr.format(*t).rstrip()[:maxcols] + "\n"
         return res.lstrip()
 
 
@@ -573,6 +577,13 @@ def xtable_main():
         help="super wrap mode",
     )
     parser.add_argument(
+        "--cutwrap",
+        dest="cutwrap",
+        action="store_true",
+        default=False,
+        help="cut those out of screen than wrapping to new line",
+    )
+    parser.add_argument(
         "--colors",
         dest="colors",
         action="store_true",
@@ -656,6 +667,7 @@ def xtable_main():
                 widthhint=args.widthhint,
                 rowperpage=args.page,
                 superwrap=args.superwrap,
+                cutwrap=args.cutwrap,
             )
             if args.debug:
                 print(dump_xtable(xt), file=sys.stderr, flush=True)
@@ -686,6 +698,7 @@ def xtable_main():
                 widthhint=args.widthhint,
                 rowperpage=args.page,
                 superwrap=args.superwrap,
+                cutwrap=args.cutwrap,
             )
             if args.debug:
                 print(dump_xtable(xt), file=sys.stderr, flush=True)
@@ -751,6 +764,7 @@ def xtable_main():
         rowperpage=args.page,
         debug=args.debug,
         superwrap=args.superwrap,
+        cutwrap=args.cutwrap,
     )
     if args.debug:
         dump_xtable(xt)

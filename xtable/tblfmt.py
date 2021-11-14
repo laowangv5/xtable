@@ -379,11 +379,11 @@ class xtable:
                     maxcols = columns if self.__cutwrap else 2**20
                     res += '\033[1m' + color(fmtstr.format(*xhdr).strip()[:maxcols],
                                              fg=hc) + '\033[0m' + "\n"
-                    res += "|".join(['-' * (int(w)) for w in width])[:maxcols] + "\n"
+                    res += "|".join(['-' * (int(w)) for w in width])[:columns] + "\n"
             else:
                 if not self.__superwrap:
                     res += fmtstr.format(*xhdr).strip() + "\n"
-                    res += "|".join(['-' * (int(w)) for w in width]) + "\n"
+                    res += "|".join(['-' * (int(w)) for w in width])[:columns] + "\n"
             headlines = res
         oldrow = None
         rcolor = os.environ.get("xtable_rows_color", "58:95")

@@ -241,7 +241,7 @@ class xtable:
         fmtstr = "{:" + str(maxcolwidth) + "} : {}"
         res = ""
         for r, row in enumerate(self.__data):
-            res += "# row {} \n".format(r)
+            res += "\n# row {} \n".format(r)
             for i, c in enumerate(row):
                 if i < len(self.__header):
                     res += fmtstr.format(self.__header[i], c) + "\n"
@@ -392,7 +392,7 @@ class xtable:
         ]
         for rn, r in enumerate(self.__data):
             if self.__superwrap:
-                res += "# row {} \n".format(rn)
+                res += "\n# row {} \n".format(rn)
             if rn != 0 and rn % self.__rowperpage == 0 and not self.__superwrap:
                 res += headlines
             if rn == 0:
@@ -414,6 +414,7 @@ class xtable:
             if len(row) < len(width):
                 row.extend([""] * (len(width) - len(row)))
             columns = os.get_terminal_size().columns
+            headershown = False
             for t in self.__splitrow(row, width):
                 twidth = copy.copy(width)
                 for ix, w in enumerate(twidth):
@@ -423,15 +424,15 @@ class xtable:
                 if colored:
                     if self.__superwrap:
                         hdrs = xfmtstr.format(*xhdr).strip().split("\\n")
-                        bars = xfmtstr.format(
-                            *(['-' * (int(w)) for w in width])).split("\\n")
+                        bars = xfmtstr.format(*(['-' * (int(w)) for w in width])).split("\\n")
                         newstr = xfmtstr.format(*t).rstrip().split("\\n")
                         for i in range(len(hdrs)):
-                            res += '\033[1m' + color(hdrs[i].rstrip(),
-                                                     fg=21) + '\033[0m' + "\n"
-                            res += (bars[i][:columns]) + "\n"
+                            if not headershown :
+                                res += '\033[1m' + color(hdrs[i].rstrip(), fg=21) + '\033[0m' + "\n"
+                                res += (bars[i][:columns]).rstrip().replace(" ","|") + "\n"
                             res += forecolors[rn % 2](newstr[i].rstrip()) + "\n"
-                        res += "\n"
+                        headershown = True
+                        #res += "\n"
                     else:
                         res += forecolors[rn % 2](
                             fmtstr.format(*t).rstrip()) + "\n"
@@ -442,13 +443,15 @@ class xtable:
                             *(['-' * (int(w)) for w in width])).split("\\n")
                         newstr = xfmtstr.format(*t).rstrip().split("\\n")
                         for i in range(len(hdrs)):
-                            res += (hdrs[i].rstrip()) + "\n"
-                            res += (bars[i][:columns]) + "\n"
+                            if not headershown :
+                                res += (hdrs[i].rstrip()) + "\n"
+                                res += (bars[i][:columns].rstrip().teplace(" ","|")) + "\n"
                             res += (newstr[i].rstrip()) + "\n"
-                        res += "\n"
+                        headershown = True
+                        #res += "\n"
                     else:
                         res += fmtstr.format(*t).rstrip() + "\n"
-        return res
+        return res.lstrip()
 
 
 def tokenize(s):

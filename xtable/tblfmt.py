@@ -413,6 +413,7 @@ class xtable:
                     oldrow = r
             if len(row) < len(width):
                 row.extend([""] * (len(width) - len(row)))
+            columns = os.get_terminal_size().columns
             for t in self.__splitrow(row, width):
                 twidth = copy.copy(width)
                 for ix, w in enumerate(twidth):
@@ -426,11 +427,10 @@ class xtable:
                             *(['-' * (int(w)) for w in width])).split("\\n")
                         newstr = xfmtstr.format(*t).rstrip().split("\\n")
                         for i in range(len(hdrs)):
-                            #res += (hdrs[i]) + "\n"
-                            res += '\033[1m' + color(hdrs[i],
+                            res += '\033[1m' + color(hdrs[i].rstrip(),
                                                      fg=21) + '\033[0m' + "\n"
-                            res += (bars[i]) + "\n"
-                            res += forecolors[rn % 2](newstr[i]) + "\n"
+                            res += (bars[i][:columns]) + "\n"
+                            res += forecolors[rn % 2](newstr[i].rstrip()) + "\n"
                         res += "\n"
                     else:
                         res += forecolors[rn % 2](
@@ -442,9 +442,9 @@ class xtable:
                             *(['-' * (int(w)) for w in width])).split("\\n")
                         newstr = xfmtstr.format(*t).rstrip().split("\\n")
                         for i in range(len(hdrs)):
-                            res += (hdrs[i]) + "\n"
-                            res += (bars[i]) + "\n"
-                            res += (newstr[i]) + "\n"
+                            res += (hdrs[i].rstrip()) + "\n"
+                            res += (bars[i][:columns]) + "\n"
+                            res += (newstr[i].rstrip()) + "\n"
                         res += "\n"
                     else:
                         res += fmtstr.format(*t).rstrip() + "\n"

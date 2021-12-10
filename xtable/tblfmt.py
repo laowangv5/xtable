@@ -682,7 +682,23 @@ def xtable_main():
         if done:
             sys.exit(0)
 
+    import signal
+    TIMEOUT = 1
+    def interrupted(signal, frame):
+        print("# timeout/no input from STDIN detected.",
+              file=sys.stderr,
+              flush=True)
+        parser.print_help()
+        sys.exit(0)
+
+    try :
+        signal.signal(signal.SIGALRM, interrupted)
+        signal.alarm(TIMEOUT)
+    except :
+        pass
     instr = INPUT.read()
+    signal.alarm(0)
+
     js = None
     try:
         js = json.loads(instr)

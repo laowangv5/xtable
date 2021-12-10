@@ -350,8 +350,12 @@ class xtable:
         for ix, w in enumerate(twidth):
             twidth[ix] = (w - wcswidth(str(self.__header[ix])) +
                           len(str(self.__header[ix])))
+        try :
+            columns = os.get_terminal_size().columns
+        except :
+            columns = 9999
         if self.__superwrap:
-            termwidth = os.get_terminal_size().columns
+            termwidth = columns
             fmtstr = ""
             curw = 0
             for l in twidth:
@@ -365,7 +369,6 @@ class xtable:
         xfmtstr = fmtstr
         res = ""
         headlines = ""
-        columns = os.get_terminal_size().columns
         if not self.__noheader:
             xhdr = [h[:width[i]] for i, h in enumerate(self.__header)]
             if colored:

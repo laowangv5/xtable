@@ -198,7 +198,7 @@ class xtable:
         for r in ([self.__header] + self.__data):
             for i, c in enumerate(r):
                 if len(str(c)) > int(width[i]):
-                    width[i] = len(c)
+                    width[i] = len(str(c))
         width = [max(4, w) for w in width]
         fmtstr = "| " + "|".join([" {:" + str(w) + "} " for w in width]) + " |"
         print(fmtstr)
@@ -222,20 +222,21 @@ class xtable:
 
     def html(self):
         res = '<table border=1 style="border-collapse:collapse;">\n'
-        res += "<tr>\n"
+        res += "<tr>"
         for h in self.__header:
-            res += "<td><b>" + str(h) + "</b></td>\n"
+            res += "<td><b>" + str(h) + "</b></td>"
         res += "</tr>\n"
         for row in self.__data:
-            res += "<tr>\n"
+            res += "<tr>"
             for c in row:
                 if not c:
                     if c == 0:
                         c = "0"
                     else:
                         c = ""
-                res += "<td><pre>" + str(c) + "</pre></td>\n"
+                res += "<td><pre>" + str(c) + "</pre></td>"
             res += "</tr>\n"
+        res += "</table>\n"
         return res
 
     def pivot(self):
@@ -270,7 +271,7 @@ class xtable:
                 left = ln
                 while left:
                     start = 0
-                    end = min(maxcolwidth, len(left))
+                    end = min(maxcolwidth, len(str(left)))
                     oldend = end
                     while end > start and (
                             wcswidth(left[start:end]) > maxcolwidth

@@ -220,7 +220,7 @@ class xtable:
                 row += ['' for i in range(wh-len(row))]
             changed = True
         if changed :
-            print("# WARNING : header and data not not well matched!", file=sys.stderr, flush=True)
+            print("# WARNING : header and data are not well matched!", file=sys.stderr, flush=True)
 
     def json(self):
         self.datafix()

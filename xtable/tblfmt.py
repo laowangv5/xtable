@@ -109,13 +109,15 @@ class xtable:
                  rowperpage=2**30,
                  debug=False,
                  superwrap=False,
-                 cutwrap=False):
+                 cutwrap=False,
+                 force_colored=None):
         self.__noheader = noheader
         self.__maxrows = maxrows
         self.__superwrap = superwrap
         self.__cutwrap = cutwrap
         self.__rowperpage = rowperpage or 2**30
         self.__widthhint = widthhint
+        self.__force_colored = force_colored
         self.__tree = tree
         self.__data = data or list()
         self.__header = header or list()
@@ -327,6 +329,8 @@ class xtable:
             if ix < len(width)
         ],
                            fillvalue="")
+    def set_color(colored) :
+        self.__force_colored = colored
 
     def __repr__(self):
         if self.__debug:
@@ -357,9 +361,12 @@ class xtable:
         if supports_color() or os.environ.get(
                 "force_ansicolor", "").lower() in ["true", "yes", "y", "1"]:
             colored = True
+        if self.__force_colored :
+            colored = self.__force_colored
         if os.environ.get("force_ansicolor",
                           "").lower() in ["false", "no", "n", "0"]:
             colored = False
+
         if self.__superwrap:
             self.__widthhint = None
         width = [0 for _ in range(len(self.__header))]
@@ -434,7 +441,9 @@ class xtable:
             c2 = int(m.group(2))
         else:
             c1 = 58
-            c1 = 95
+            c2 = 95
+        if self.__superwrap :
+            c2 = c1
         forecolors = [
             lambda x: color(str(x), fg=c1), lambda x: color(str(x), fg=c2)
         ]

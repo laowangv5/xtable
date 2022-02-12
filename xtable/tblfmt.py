@@ -243,6 +243,10 @@ class xtable:
                 res += (fmtstr.format(*r)) + "\n"
         return res
 
+    def wrap(self) :
+        self.__superwrap = True
+        return self.__repr__()
+
     def csv(self):
         import io
         si = io.StringIO()
@@ -437,6 +441,7 @@ class xtable:
         for rn, r in enumerate(self.__data):
             if self.__superwrap:
                 res += "\n# row {} \n".format(rn)
+                pass
             if rn != 0 and rn % self.__rowperpage == 0 and not self.__superwrap:
                 res += headlines
             if rn == 0:
@@ -488,7 +493,7 @@ class xtable:
                         for i in range(len(hdrs)):
                             if not headershown :
                                 res += (hdrs[i].rstrip()) + "\n"
-                                res += (bars[i][:columns].rstrip().teplace(" ","|")) + "\n"
+                                res += (bars[i][:columns].rstrip().replace(" ","|")) + "\n"
                             res += (newstr[i].rstrip()) + "\n"
                         headershown = True
                         #res += "\n"

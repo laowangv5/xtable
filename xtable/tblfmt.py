@@ -205,7 +205,20 @@ class xtable:
             return None
         self.__data += other.__data
 
+    def datafix(self) :
+        wh = len(self.__header) 
+        if len(self.__data) > 0 :
+            wd=max([len(row) for row in self.__data])
+        else :
+            wd = wh
+        if wh < wd :
+            self.__header += ['n/a' for i in range(wd-wh)]
+        if wh > wd :
+            for row in self__data :
+                row += ['' for i in range(wh-len(row))]
+
     def json(self):
+        self.datafix()
         import json
         tbl = list()
         for r in self.__data:
@@ -216,6 +229,7 @@ class xtable:
         return json.dumps(tbl, indent=2)
 
     def yaml(self):
+        self.datafix()
         import yaml
         tbl = list()
         for r in self.__data:

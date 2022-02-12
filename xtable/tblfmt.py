@@ -211,11 +211,16 @@ class xtable:
             wd=max([len(row) for row in self.__data])
         else :
             wd = wh
+        changed = False
         if wh < wd :
             self.__header += ['n/a' for i in range(wd-wh)]
+            changed = True
         if wh > wd :
             for row in self__data :
                 row += ['' for i in range(wh-len(row))]
+            changed = True
+        if changed :
+            print("# WARNING : header and data not not well matched!", file=sys.stderr, flush=True)
 
     def json(self):
         self.datafix()
@@ -240,6 +245,7 @@ class xtable:
         return yaml.safe_dump(tbl, default_flow_style=False)
 
     def markdown(self):
+        self.datafix()
         if not self.__header or not self.__data:
             return ""
         res = ""
@@ -261,9 +267,11 @@ class xtable:
 
     def wrap(self) :
         self.__superwrap = True
+        self.datafix()
         return self.__repr__()
 
     def csv(self):
+        self.datafix()
         import io
         si = io.StringIO()
         w = csv.writer(si)
@@ -274,6 +282,7 @@ class xtable:
         return si.getvalue()
 
     def html(self):
+        self.datafix()
         res = '<table border=1 style="border-collapse:collapse;">\n'
         res += "<tr>"
         for h in self.__header:
@@ -293,6 +302,7 @@ class xtable:
         return res
 
     def pivot(self):
+        self.datafix()
         maxcolwidth = max([wcswidth(h) for h in self.__header])
         fmtstr = "{:" + str(maxcolwidth) + "} : {}"
         res = ""

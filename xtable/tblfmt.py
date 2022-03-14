@@ -130,9 +130,8 @@ class xtable:
                 for d in data:
                     self.__data.append([d[i] for i in xmap])
         else:
-            if self.__noheader and len(self.__data) > 0:
-                self.__header = self.__data[0]
-                self.__data = self.__data[1:self.__maxrows]
+            if self.__noheader and len(self.__data) > 0 and not self.__header :
+                self.__header =["c"+str(i) for i in range(len(self.__data[0]))]
         self.__num_of_cols = len(self.__header)
         self.__debug = debug
 
@@ -732,7 +731,7 @@ def xtable_main():
     if args.forcecsv:
         done = False
         try:
-            xt = xtable.init_from_csv_fh(INPUT, delimiter=args.sepchar)
+            xt = xtable.init_from_csv_fh(INPUT)
             xt = xtable(
                 header=xt.get_header(),
                 data=xt.get_data(),

@@ -445,7 +445,7 @@ class xtable:
                 if m:
                     hc = int(m.group(1))
                 else:
-                    hc = 21
+                    hc = 142
                 if not self.__superwrap:
                     maxcols = columns if self.__cutwrap else 2**20
                     res += '\033[1m' + color(fmtstr.format(*xhdr).strip()[:maxcols],

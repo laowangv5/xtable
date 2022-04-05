@@ -440,12 +440,12 @@ class xtable:
         if not self.__noheader:
             xhdr = [h[:width[i]] for i, h in enumerate(self.__header)]
             if colored:
-                hcolor = os.environ.get("xtable_header_color", "21")
+                hcolor = os.environ.get("xtable_header_color", "106")
                 m = re.search(r"(\d+)", hcolor)
                 if m:
                     hc = int(m.group(1))
                 else:
-                    hc = 142
+                    hc = 106
                 if not self.__superwrap:
                     maxcols = columns if self.__cutwrap else 2**20
                     res += '\033[1m' + color(fmtstr.format(*xhdr).strip()[:maxcols],

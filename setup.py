@@ -10,7 +10,7 @@ README = (HERE / "README.md").read_text()
 # This call to setup() does all the work
 setup(
     name="xtable",
-    version="1.0.48",
+    version="1.0.49",
     description=
     "operate table format in console. console table, csv, json, yaml and markdown.",
     long_description=README,

@@ -221,25 +221,32 @@ class xtable:
         if changed :
             print("# WARNING : header and data are not well matched!", file=sys.stderr, flush=True)
 
-    def json(self):
+    def json(self,forcestring=False):
         self.datafix()
         import json
         tbl = list()
         for r in self.__data:
             row = dict()
             for ix, val in enumerate(r):
-                row[self.__header[ix]] = val
+                if forcestring :
+                    row[self.__header[ix]] = sr(val)
+                else :
+                    row[self.__header[ix]] = val
             tbl.append(row)
         return json.dumps(tbl, indent=2)
 
-    def yaml(self):
+    def yaml(self,forcestring=False):
         self.datafix()
         import yaml
         tbl = list()
         for r in self.__data:
             row = dict()
             for ix, val in enumerate(r):
-                row[self.__header[ix]] = val
+                if forcestring :
+                    row[self.__header[ix]] = sr(val)
+                else :
+                    row[self.__header[ix]] = val
+            tbl.append(row)
             tbl.append(row)
         return yaml.safe_dump(tbl, default_flow_style=False)
 

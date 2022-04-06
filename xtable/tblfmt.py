@@ -229,7 +229,7 @@ class xtable:
             row = dict()
             for ix, val in enumerate(r):
                 if forcestring :
-                    row[self.__header[ix]] = sr(val)
+                    row[self.__header[ix]] = str(val)
                 else :
                     row[self.__header[ix]] = val
             tbl.append(row)
@@ -243,7 +243,7 @@ class xtable:
             row = dict()
             for ix, val in enumerate(r):
                 if forcestring :
-                    row[self.__header[ix]] = sr(val)
+                    row[self.__header[ix]] = str(val)
                 else :
                     row[self.__header[ix]] = val
             tbl.append(row)

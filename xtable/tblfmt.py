@@ -761,7 +761,7 @@ def xtable_main():
             sys.exit(0)
 
     import signal
-    TIMEOUT = 1
+    TIMEOUT = 10
     def interrupted(signal, frame):
         print("# timeout/no input from STDIN detected.",
               file=sys.stderr,

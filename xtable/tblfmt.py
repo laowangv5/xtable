@@ -215,7 +215,7 @@ class xtable:
             self.__header += ['n/a' for i in range(wd-wh)]
             changed = True
         if wh > wd :
-            for row in self__data :
+            for row in self.__data :
                 row += ['' for i in range(wh-len(row))]
             changed = True
         if changed :

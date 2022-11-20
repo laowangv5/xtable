@@ -98,6 +98,18 @@ def prepare_table(xjson, xheader=None):
 
 
 class xtable:
+
+    def _fsort(self,x):
+        v = list()
+        for i in re.split(r",", self.__sortby):
+            v0 = x[int(i)] or ""
+            if re.match(r"^\d+(\.\d*)*$", v0):
+                v.append(float(v0))
+            else:
+                v.append(0)
+            v.append(v0)
+        return v
+
     def __init__(self,
                  data=None,
                  header=None,
@@ -134,6 +146,8 @@ class xtable:
         else:
             if self.__noheader and len(self.__data) > 0 and not self.__header :
                 self.__header =["c"+str(i) for i in range(len(self.__data[0]))]
+        if self.__sortby :
+            self.__data = sorted(self.__data, key=self._fsort)
         self.__num_of_cols = len(self.__header)
         self.__debug = debug
 
@@ -161,7 +175,7 @@ class xtable:
             header = data[0]
             data = data[1:]
         if self.__sortby :
-            data = sorted(data, key=_fsort)
+            data = sorted(data, key=self._fsort)
         return xtable(data, header)
 
     #@staticmethod
@@ -179,7 +193,7 @@ class xtable:
             header = data[0]
             data = data[1:]
         if self.__sortby:
-            data = sorted(data, key=_fsort)
+            data = sorted(data, key=self._fsort)
         return xtable(data, header)
 
     #@staticmethod
@@ -188,14 +202,14 @@ class xtable:
             xjson = open(xjson, "r").read()
         data, hdr = prepare_table(xjson, xheader)
         if self.__sortby:
-            data = sorted(data, key=_fsort)
+            data = sorted(data, key=self._fsort)
         return xtable(data, hdr)
 
     #@staticmethod
     def init_from_list(self,xlist, xheader=None):
         data, hdr = prepare_table(xlist, xheader)
         if self.__sortby:
-            data = sorted(data, key=_fsort)
+            data = sorted(data, key=self._fsort)
         return xtable(data, hdr)
 
     def __len__(self):

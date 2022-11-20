@@ -110,6 +110,7 @@ class xtable:
                  debug=False,
                  superwrap=False,
                  cutwrap=False,
+                 sortby=None,
                  force_colored=None):
         self.__noheader = noheader
         self.__maxrows = maxrows
@@ -118,6 +119,7 @@ class xtable:
         self.__rowperpage = rowperpage or 2**30
         self.__widthhint = widthhint
         self.__force_colored = force_colored
+        self.__sortby = sortby
         self.__tree = tree
         self.__data = data or list()
         self.__header = header or list()
@@ -141,8 +143,8 @@ class xtable:
     def get_header(self):
         return self.__header
 
-    @staticmethod
-    def init_from_csv(csvfile, xheader=None, delimiter=',', quotechar='"'):
+    #@staticmethod
+    def init_from_csv(self,csvfile, xheader=None, delimiter=',', quotechar='"'):
         header = list()
         data = list()
         if xheader:
@@ -158,10 +160,12 @@ class xtable:
         if not header and len(data) > 0:
             header = data[0]
             data = data[1:]
+        if self.__sortby :
+            data = sorted(data, key=_fsort)
         return xtable(data, header)
 
-    @staticmethod
-    def init_from_csv_fh(csvfh, xheader=None, delimiter=',', quotechar='"'):
+    #@staticmethod
+    def init_from_csv_fh(self,csvfh, xheader=None, delimiter=',', quotechar='"'):
         header = list()
         data = list()
         if xheader:
@@ -174,18 +178,24 @@ class xtable:
         if not header and len(data) > 0:
             header = data[0]
             data = data[1:]
+        if self.__sortby:
+            data = sorted(data, key=_fsort)
         return xtable(data, header)
 
-    @staticmethod
-    def init_from_json(xjson, xheader=None):
+    #@staticmethod
+    def init_from_json(self,xjson, xheader=None):
         if type(xjson) is str and os.path.isfile(xjson):
             xjson = open(xjson, "r").read()
         data, hdr = prepare_table(xjson, xheader)
+        if self.__sortby:
+            data = sorted(data, key=_fsort)
         return xtable(data, hdr)
 
-    @staticmethod
-    def init_from_list(xlist, xheader=None):
+    #@staticmethod
+    def init_from_list(self,xlist, xheader=None):
         data, hdr = prepare_table(xlist, xheader)
+        if self.__sortby:
+            data = sorted(data, key=_fsort)
         return xtable(data, hdr)
 
     def __len__(self):
@@ -685,6 +695,17 @@ def xtable_main():
         showcolors()
         sys.exit(0)
 
+    def _fsort(x):
+        v = list()
+        for i in re.split(r",", self.__sortby):
+            v0 = x[int(i)] or ""
+            if re.match(r"^\d+(\.\d*)*$", v0):
+                v.append(float(v0))
+            else:
+                v.append(0)
+            v.append(v0)
+        return v
+
     def showres(t):
         if args.pivot:
             print(t.pivot())
@@ -738,7 +759,7 @@ def xtable_main():
     if args.forcecsv:
         done = False
         try:
-            xt = xtable.init_from_csv_fh(INPUT)
+            xt = xtable(data=[],header=[]).init_from_csv_fh(INPUT)
             xt = xtable(
                 header=xt.get_header(),
                 data=xt.get_data(),
@@ -749,6 +770,7 @@ def xtable_main():
                 rowperpage=args.page,
                 superwrap=args.superwrap,
                 cutwrap=args.cutwrap,
+                sortby=args.sortby,
             )
             if args.debug:
                 print(dump_xtable(xt), file=sys.stderr, flush=True)
@@ -785,7 +807,7 @@ def xtable_main():
 
     if js:
         if type(js) is list:
-            xt = xtable.init_from_json(js, args.header)
+            xt = xtable(data=[],header=[]).init_from_json(js, args.header)
             xt = xtable(
                 header=xt.get_header(),
                 data=xt.get_data(),
@@ -796,6 +818,7 @@ def xtable_main():
                 rowperpage=args.page,
                 superwrap=args.superwrap,
                 cutwrap=args.cutwrap,
+                sortby=args.sortby,
             )
             if args.debug:
                 print(dump_xtable(xt), file=sys.stderr, flush=True)
@@ -838,19 +861,7 @@ def xtable_main():
     if args.dataonly:
         data = [oheader] + data
     if args.sortby:
-
-        def fsort(x):
-            v = list()
-            for i in re.split(r",", args.sortby):
-                v0 = x[int(i)] or ""
-                if re.match(r"^\d+(\.\d*)*$", v0):
-                    v.append(float(v0))
-                else:
-                    v.append(0)
-                v.append(v0)
-            return v
-
-        data = sorted(data, key=fsort)
+        data = sorted(data, key=_fsort)
     xt = xtable(
         header=oheader,
         data=data,
@@ -862,6 +873,7 @@ def xtable_main():
         debug=args.debug,
         superwrap=args.superwrap,
         cutwrap=args.cutwrap,
+        sortby=args.sortby,
     )
     if args.debug:
         dump_xtable(xt)

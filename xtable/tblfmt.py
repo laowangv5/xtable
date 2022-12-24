@@ -86,7 +86,7 @@ def prepare_table(xjson, xheader=None):
                 data.append(r)
         else:
             print("# not supported format.", file=sys.stderr, flush=True)
-            print(json.dumps(js, indent=2), file=sys.stderr, flush=True)
+            print(json.dumps(js, indent=2, default=str), file=sys.stderr, flush=True)
             return (None, None)
     except:
         traceback.print_exc()
@@ -257,7 +257,7 @@ class xtable:
                 else :
                     row[self.__header[ix]] = val
             tbl.append(row)
-        return json.dumps(tbl, indent=2)
+        return json.dumps(tbl, indent=2, default=str)
 
     def yaml(self,forcestring=False):
         self.datafix()
@@ -766,8 +766,8 @@ def xtable_main():
         INPUT = open(args.infile, "r")
 
     def dump_xtable(xt):
-        res = "# xtable.header : " + json.dumps(xt.get_header()) + "\n"
-        res += "# xtable.data   : " + json.dumps(xt.get_data())
+        res = "# xtable.header : " + json.dumps(xt.get_header(), default=str) + "\n"
+        res += "# xtable.data   : " + json.dumps(xt.get_data(), default=str)
         return
 
     if args.forcecsv:

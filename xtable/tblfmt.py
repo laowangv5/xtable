@@ -711,7 +711,7 @@ def xtable_main():
 
     def _fsort(x):
         v = list()
-        for i in re.split(r",", self.__sortby):
+        for i in re.split(r",", args.sortby):
             v0 = x[int(i)] or ""
             if re.match(r"^\d+(\.\d*)*$", v0):
                 v.append(float(v0))

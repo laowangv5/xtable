@@ -368,8 +368,7 @@ class xtable:
                     oldend = end
                     while end > start and (
                             wcswidth(left[start:end]) > maxcolwidth
-                            or left[end - 1]
-                            not in string.punctuation + string.whitespace):
+                            or left[end - 1] not in string.whitespace):
                         end -= 1
                     if end == start:
                         end = oldend

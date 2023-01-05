@@ -272,7 +272,7 @@ class xtable:
                     row[self.__header[ix]] = val
             tbl.append(row)
             tbl.append(row)
-        return yaml.safe_dump(tbl, default_flow_style=False)
+        return yaml.safe_dump(json.loads(json.dumps(tbl,default=str)), default_flow_style=False)
 
     def markdown(self):
         self.datafix()
